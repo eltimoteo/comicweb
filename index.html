@@ -86,9 +86,17 @@
     <script>
         // --- CONFIGURATION: PASTE YOUR SHEET IDs HERE ---
         const sheetConfig = {
-            marvel: "https://docs.google.com/spreadsheets/d/e/2PACX-1vTFTPLKwr0aJgqiW3fPIbp5SvHLSDu6mPGnILzw9uMBKWfw7VdNykUY4NLiGNcb4dU3VI7XLkO8iSqX/pub?output=csv",
-            dc: "https://docs.google.com/spreadsheets/d/e/2PACX-1vTFTPLKwr0aJgqiW3fPIbp5SvHLSDu6mPGnILzw9uMBKWfw7VdNykUY4NLiGNcb4dU3VI7XLkO8iSqX/pub?output=csv",
-            others: "https://docs.google.com/spreadsheets/d/e/2PACX-1vTFTPLKwr0aJgqiW3fPIbp5SvHLSDu6mPGnILzw9uMBKWfw7VdNykUY4NLiGNcb4dU3VI7XLkO8iSqX/pub?output=csv"
+            // VERIFICATION REQUIRED:
+            // 1. "Publish to Web" -> "Entire Document" -> "Comma-separated values (.csv)"
+            // 2. Paste the generated link below as 'baseUrl'.
+            baseUrl: "https://docs.google.com/spreadsheets/d/e/2PACX-1vTFTPLKwr0aJgqiW3fPIbp5SvHLSDu6mPGnILzw9uMBKWfw7VdNykUY4NLiGNcb4dU3VI7XLkO8iSqX/pub?output=csv",
+
+            // 3. Enter the GID for each tab (found in the browser URL as &gid=...)
+            tabs: {
+                marvel: "61223904",
+                dc: "0",
+                others: "1684289763"
+            }
         };
         // ------------------------------------------------
 
@@ -116,11 +124,18 @@
             grid.innerHTML = '';
             loader.classList.remove('hidden');
 
-            const sheetId = sheetConfig[key];
-            let csvUrl = sheetId;
-            if (!sheetId.startsWith('http')) {
-                csvUrl = `https://docs.google.com/spreadsheets/d/${sheetId}/pub?output=csv`;
-            }
+            const baseUrl = sheetConfig.baseUrl;
+            const gid = sheetConfig.tabs[key];
+
+            // Clean the base URL to ensure we append params correctly
+            // Remove any existing query params to rebuild them clean
+            const cleanBase = baseUrl.split('?')[0];
+
+            // Construct new URL with specific GID
+            // Format: .../pub?gid={gid}&single=true&output=csv
+            const csvUrl = `${cleanBase}?gid=${gid}&single=true&output=csv`;
+
+            console.log(`Loading ${key} from: ${csvUrl}`); // Debug log
 
             Papa.parse(csvUrl, {
                 download: true,
