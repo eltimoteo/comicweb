@@ -117,7 +117,10 @@
             loader.classList.remove('hidden');
 
             const sheetId = sheetConfig[key];
-            const csvUrl = `https://docs.google.com/spreadsheets/d/${sheetId}/pub?output=csv`;
+            let csvUrl = sheetId;
+            if (!sheetId.startsWith('http')) {
+                csvUrl = `https://docs.google.com/spreadsheets/d/${sheetId}/pub?output=csv`;
+            }
 
             Papa.parse(csvUrl, {
                 download: true,
