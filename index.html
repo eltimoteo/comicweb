@@ -115,14 +115,14 @@
         <div class="w-full max-w-2xl p-10">
             <div id="terminal-text" class="text-green-500 mb-2"></div>
             <div class="text-[var(--text-muted)] text-sm mt-4 hidden" id="splash-footer">Initializing environment...
-                v2.57.6</div>
+                v2.58.0</div>
         </div>
     </div>
 
     <!-- VSCode Title Bar (Fake) -->
     <div class="h-8 bg-[var(--bg-input)] flex items-center justify-between px-4 text-xs select-none">
         <div class="flex gap-4">
-            <span class="font-bold">ComicDB.workspace-v2.57.6</span>
+            <span class="font-bold">ComicDB.workspace-v2.58.0</span>
             <span class="text-[var(--text-muted)]">File</span>
             <span class="text-[var(--text-muted)]">Edit</span>
             <span class="text-[var(--text-muted)]">Selection</span>
@@ -685,6 +685,7 @@
                         
                         <div class="pl-4 ml-1" style="border-left: 1px solid var(--border)">
                             <div><span style="color: var(--variable)">author</span>: <span style="color: var(--string)">"${comic.WRITER}"</span>;</div>
+                            <div><span style="color: var(--variable)">artist</span>: <span style="color: var(--string)">"${comic.ARTIST}"</span>;</div>
                             <div><span style="color: var(--variable)">year</span>: <span style="color: var(--number)">${(comic.PUBLISH || '').match(/\d{4}/)?.[0] || 'null'}</span>;</div>
                             <div><span style="color: var(--variable)">read</span>: <span style="color: var(--keyword)">${isRead}</span>;</div>
                             ${comic.RATING ? `<div><span style="color: var(--variable)">rating</span>: <span style="color: var(--number)">${comic.RATING}</span>;</div>` : ''}
