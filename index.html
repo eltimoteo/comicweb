@@ -64,15 +64,15 @@
             <input type="text" id="searchInput" placeholder="Search title, writer, character..."
                 class="w-full p-3 rounded bg-gray-700 border border-gray-600 text-white focus:outline-none focus:border-blue-400">
             <select id="readFilter" class="p-3 rounded bg-gray-700 border border-gray-600 text-white">
-                <option value="all">All Status</option>
-                <option value="read">Read Only</option>
+                <option value="all">All</option>
+                <option value="read">Read</option>
                 <option value="unread">Unread</option>
             </select>
 
             <select id="sortSelect" class="p-3 rounded bg-gray-700 border border-gray-600 text-white">
-                <option value="title">Sort by Title (A-Z)</option>
-                <option value="year">Sort by Year (Newest)</option>
-                <option value="rating">Sort by Rating (High)</option>
+                <option value="title">Sort by Title</option>
+                <option value="year">Sort by Year</option>
+                <option value="rating">Sort by Rating</option>
                 <option value="imprint">Sort by Imprint</option>
                 <option value="character">Sort by Character</option>
             </select>
@@ -138,13 +138,13 @@
                 updateSortUI();
                 renderComics();
             });
-            
+
             updateSortUI(); // Initial icon
         });
 
         function updateSortUI() {
             const orderBtn = document.getElementById('orderBtn');
-            
+
             // Update Icon
             if (isDescending) {
                 orderBtn.innerHTML = `<i class="fa-solid fa-arrow-down-z-a"></i>`; // Descending
