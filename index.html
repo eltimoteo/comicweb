@@ -9,7 +9,7 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.0/papaparse.min.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-    
+
     <!-- Google Fonts: Outfit -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -21,8 +21,8 @@
             background-color: #0f172a;
             color: #e2e8f0;
             /* Deep modern gradient */
-            background-image: 
-                radial-gradient(at 0% 0%, rgba(56, 189, 248, 0.1) 0px, transparent 50%), 
+            background-image:
+                radial-gradient(at 0% 0%, rgba(56, 189, 248, 0.1) 0px, transparent 50%),
                 radial-gradient(at 100% 0%, rgba(139, 92, 246, 0.1) 0px, transparent 50%);
             background-attachment: fixed;
         }
@@ -31,13 +31,16 @@
         ::-webkit-scrollbar {
             width: 8px;
         }
+
         ::-webkit-scrollbar-track {
             background: #0f172a;
         }
+
         ::-webkit-scrollbar-thumb {
             background: #334155;
             border-radius: 4px;
         }
+
         ::-webkit-scrollbar-thumb:hover {
             background: #475569;
         }
@@ -52,6 +55,7 @@
         .comic-card {
             transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
         }
+
         .comic-card:hover {
             transform: translateY(-8px) scale(1.02);
             box-shadow: 0 20px 40px -10px rgba(0, 0, 0, 0.5);
@@ -59,9 +63,9 @@
 
         /* Input Auto-fill fix for dark mode */
         input:-webkit-autofill,
-        input:-webkit-autofill:hover, 
-        input:-webkit-autofill:focus, 
-        input:-webkit-autofill:active{
+        input:-webkit-autofill:hover,
+        input:-webkit-autofill:focus,
+        input:-webkit-autofill:active {
             -webkit-box-shadow: 0 0 0 30px #1e293b inset !important;
             -webkit-text-fill-color: white !important;
             transition: background-color 5000s ease-in-out 0s;
@@ -72,39 +76,42 @@
 <body class="min-h-screen p-4 md:p-10 selection:bg-blue-500 selection:text-white">
 
     <div class="max-w-8xl mx-auto">
-        
+
         <!-- Interactive Background Patterns -->
-        <div class="fixed inset-0 pointer-events-none opacity-20" 
-             style="background-image: url('data:image/svg+xml,%3Csvg width=\'60\' height=\'60\' viewBox=\'0 0 60 60\' xmlns=\'http://www.w3.org/2000/svg\'%3E%3Cg fill=\'none\' fill-rule=\'evenodd\'%3E%3Cg fill=\'%239C92AC\' fill-opacity=\'0.1\'%3E%3Cpath d=\'M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z\'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E'); z-index: -1;">
+        <div class="fixed inset-0 pointer-events-none opacity-20"
+            style="background-image: url('data:image/svg+xml,%3Csvg width=\'60\' height=\'60\' viewBox=\'0 0 60 60\' xmlns=\'http://www.w3.org/2000/svg\'%3E%3Cg fill=\'none\' fill-rule=\'evenodd\'%3E%3Cg fill=\'%239C92AC\' fill-opacity=\'0.1\'%3E%3Cpath d=\'M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z\'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E'); z-index: -1;">
         </div>
 
         <!-- Header -->
         <header class="mb-12 text-center relative">
             <div class="inline-block relative">
-                <span class="absolute -inset-1 bg-gradient-to-r from-blue-600 to-purple-600 blur opacity-40 animate-pulse"></span>
-                <h1 class="relative text-5xl md:text-7xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-blue-300 via-white to-purple-300 tracking-tight mb-2">
-                    COMIC<span class="font-light text-white/50">DB</span>
+                <span
+                    class="absolute -inset-1 bg-gradient-to-r from-blue-600 to-purple-600 blur opacity-40 animate-pulse"></span>
+                <h1
+                    class="relative text-5xl md:text-7xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-blue-300 via-white to-purple-300 tracking-tight mb-2">
+                    COMIC<span class="font-light text-white/50"> DataBase</span>
                 </h1>
             </div>
-            <p class="text-slate-400 font-light tracking-widest uppercase text-sm mt-2">Personal Collection Tracker</p>
+            <p class="text-slate-400 font-light tracking-widest uppercase text-sm mt-2">Timothy R. Huang's Collection
+                Tracker</p>
         </header>
 
         <!-- Main Controls Container -->
         <div class="glass-panel rounded-2xl p-4 mb-10 sticky top-4 z-40 shadow-2xl">
             <div class="flex flex-col md:flex-row gap-4 justify-between items-center">
-                
+
                 <!-- Tab Switching -->
                 <div class="flex p-1 bg-slate-900/50 rounded-xl w-full md:w-auto overflow-x-auto">
                     <button onclick="loadSheet('marvel')" id="btn-marvel"
-                            class="flex-1 md:flex-none px-6 py-2.5 rounded-lg text-sm font-bold tracking-wide transition-all duration-300 hover:text-white text-slate-400">
+                        class="flex-1 md:flex-none px-6 py-2.5 rounded-lg text-sm font-bold tracking-wide transition-all duration-300 hover:text-white text-slate-400">
                         MARVEL
                     </button>
                     <button onclick="loadSheet('dc')" id="btn-dc"
-                            class="flex-1 md:flex-none px-6 py-2.5 rounded-lg text-sm font-bold tracking-wide transition-all duration-300 hover:text-white text-slate-400">
+                        class="flex-1 md:flex-none px-6 py-2.5 rounded-lg text-sm font-bold tracking-wide transition-all duration-300 hover:text-white text-slate-400">
                         DC
                     </button>
                     <button onclick="loadSheet('others')" id="btn-others"
-                            class="flex-1 md:flex-none px-6 py-2.5 rounded-lg text-sm font-bold tracking-wide transition-all duration-300 hover:text-white text-slate-400">
+                        class="flex-1 md:flex-none px-6 py-2.5 rounded-lg text-sm font-bold tracking-wide transition-all duration-300 hover:text-white text-slate-400">
                         INDEPENDENT
                     </button>
                 </div>
@@ -114,7 +121,8 @@
                     <!-- Search -->
                     <div class="relative group flex-grow md:flex-grow-0 md:w-64">
                         <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                            <i class="fa-solid fa-search text-slate-500 group-focus-within:text-blue-400 transition"></i>
+                            <i
+                                class="fa-solid fa-search text-slate-500 group-focus-within:text-blue-400 transition"></i>
                         </div>
                         <input type="text" id="searchInput" placeholder="Search collection..."
                             class="w-full bg-slate-800/50 border border-slate-700 text-white text-sm rounded-lg block pl-10 p-2.5 focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500 outline-none transition-all placeholder-slate-500 hover:bg-slate-800">
@@ -122,32 +130,34 @@
 
                     <!-- Filter Dropdown -->
                     <div class="relative group">
-                        <select id="readFilter" 
-                                class="bg-slate-800/50 border border-slate-700 text-white text-sm rounded-lg focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500 block w-full p-2.5 outline-none hover:bg-slate-800 cursor-pointer appearance-none pr-8">
+                        <select id="readFilter"
+                            class="bg-slate-800/50 border border-slate-700 text-white text-sm rounded-lg focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500 block w-full p-2.5 outline-none hover:bg-slate-800 cursor-pointer appearance-none pr-8">
                             <option value="all">Status: All</option>
                             <option value="read">Status: Read</option>
                             <option value="unread">Status: Unread</option>
                         </select>
-                        <i class="fa-solid fa-chevron-down absolute right-3 top-3 text-xs text-slate-500 pointer-events-none"></i>
+                        <i
+                            class="fa-solid fa-chevron-down absolute right-3 top-3 text-xs text-slate-500 pointer-events-none"></i>
                     </div>
 
                     <!-- Sort Dropdown -->
                     <div class="relative group">
-                        <select id="sortSelect" 
-                                class="bg-slate-800/50 border border-slate-700 text-white text-sm rounded-lg focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500 block w-full p-2.5 outline-none hover:bg-slate-800 cursor-pointer appearance-none pr-8">
+                        <select id="sortSelect"
+                            class="bg-slate-800/50 border border-slate-700 text-white text-sm rounded-lg focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500 block w-full p-2.5 outline-none hover:bg-slate-800 cursor-pointer appearance-none pr-8">
                             <option value="title">Sort: Title</option>
                             <option value="year">Sort: Year</option>
                             <option value="rating">Sort: Rating</option>
                             <option value="imprint">Sort: Imprint</option>
                             <option value="character">Sort: Character</option>
                         </select>
-                        <i class="fa-solid fa-chevron-down absolute right-3 top-3 text-xs text-slate-500 pointer-events-none"></i>
+                        <i
+                            class="fa-solid fa-chevron-down absolute right-3 top-3 text-xs text-slate-500 pointer-events-none"></i>
                     </div>
 
                     <!-- Order Toggle -->
-                     <button id="orderBtn"
-                            class="p-2.5 rounded-lg bg-slate-800/50 border border-slate-700 text-slate-400 hover:text-white hover:bg-slate-700 hover:border-slate-500 transition-all active:scale-95"
-                            title="Toggle Order">
+                    <button id="orderBtn"
+                        class="p-2.5 rounded-lg bg-slate-800/50 border border-slate-700 text-slate-400 hover:text-white hover:bg-slate-700 hover:border-slate-500 transition-all active:scale-95"
+                        title="Toggle Order">
                         <i class="fa-solid fa-arrow-down-a-z"></i>
                     </button>
                 </div>
@@ -166,7 +176,8 @@
         </div>
 
         <!-- Grid -->
-        <div id="comicGrid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-6 pb-20">
+        <div id="comicGrid"
+            class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-6 pb-20">
             <!-- Cards injected here -->
         </div>
 
@@ -211,12 +222,12 @@
             document.querySelectorAll('div button[id^="btn-"]').forEach(b => {
                 b.className = "flex-1 md:flex-none px-6 py-2.5 rounded-lg text-sm font-bold tracking-wide transition-all duration-300 hover:text-white text-slate-400"; // Reset
             });
-            
+
             // Set Active Style
             const activeBtn = document.getElementById(`btn-${key}`);
-            let activeColor = key === 'marvel' ? 'bg-red-600 text-white shadow-lg shadow-red-900/40' : 
-                              (key === 'dc' ? 'bg-blue-600 text-white shadow-lg shadow-blue-900/40' : 
-                              'bg-purple-600 text-white shadow-lg shadow-purple-900/40');
+            let activeColor = key === 'marvel' ? 'bg-red-600 text-white shadow-lg shadow-red-900/40' :
+                (key === 'dc' ? 'bg-blue-600 text-white shadow-lg shadow-blue-900/40' :
+                    'bg-purple-600 text-white shadow-lg shadow-purple-900/40');
             activeBtn.className = `flex-1 md:flex-none px-6 py-2.5 rounded-lg text-sm font-bold tracking-wide transition-all duration-300 ${activeColor} ring-1 ring-white/20`;
 
             grid.innerHTML = '';
@@ -299,21 +310,21 @@
             filtered.forEach((comic, index) => {
                 const isRead = (comic.READ || '').toString().toUpperCase() === 'TRUE';
                 const isOwned = (comic.OWN || '').toString().toUpperCase() === 'TRUE';
-                
+
                 // Animation Stagger
                 const card = document.createElement('div');
                 card.style.animation = `fadeInUp 0.5s ease backwards ${index * 0.05}s`;
-                
+
                 // Card HTML
                 card.className = `comic-card group relative bg-slate-800 rounded-2xl overflow-hidden shadow-xl border border-slate-700/50 ${theme.border} ${theme.glow}`;
-                
+
                 card.innerHTML = `
                     <!-- Hero Image Area -->
                     <div class="relative h-64 overflow-hidden bg-slate-900">
-                        ${comic.IMAGE ? 
-                            `<img src="${comic.IMAGE}" alt="${comic.TITLE}" class="w-full h-full object-cover opacity-90 group-hover:opacity-100 group-hover:scale-110 transition-transform duration-700 ease-in-out">` : 
-                            `<div class="w-full h-full flex items-center justify-center text-slate-700"><i class="fa-solid fa-book-open text-6xl opacity-20"></i></div>`
-                        }
+                        ${comic.IMAGE ?
+                        `<img src="${comic.IMAGE}" alt="${comic.TITLE}" class="w-full h-full object-cover opacity-90 group-hover:opacity-100 group-hover:scale-110 transition-transform duration-700 ease-in-out">` :
+                        `<div class="w-full h-full flex items-center justify-center text-slate-700"><i class="fa-solid fa-book-open text-6xl opacity-20"></i></div>`
+                    }
                         
                         <!-- Gradient Overlay -->
                         <div class="absolute inset-0 bg-gradient-to-t from-slate-900 via-slate-900/20 to-transparent"></div>
@@ -349,10 +360,10 @@
                         <!-- Footer -->
                         <div class="flex items-center justify-between pt-4 border-t border-white/5">
                             <div class="flex items-center gap-2 text-sm">
-                                ${isRead 
-                                    ? `<i class="fa-solid fa-circle-check text-emerald-500"></i> <span class="text-slate-400">Read</span>` 
-                                    : `<i class="fa-regular fa-circle text-slate-600"></i> <span class="text-slate-500">Unread</span>`
-                                }
+                                ${isRead
+                        ? `<i class="fa-solid fa-circle-check text-emerald-500"></i> <span class="text-slate-400">Read</span>`
+                        : `<i class="fa-regular fa-circle text-slate-600"></i> <span class="text-slate-500">Unread</span>`
+                    }
                             </div>
                             
                             <!-- Rating or Link -->
@@ -371,7 +382,7 @@
                 grid.appendChild(card);
             });
         }
-        
+
         // Add FadeIn Keyframe
         const style = document.createElement('style');
         style.innerHTML = `
