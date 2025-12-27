@@ -448,20 +448,21 @@
 
             // Files Icon -> Toggle Explorer
             document.getElementById('icon-files').addEventListener('click', (e) => {
-                const isActive = !sidebarExplorer.classList.contains('hidden');
+                // Check computed style or inline style for robustness
+                const isHidden = sidebarExplorer.style.display === 'none';
                 document.querySelectorAll('.activity-icon').forEach(i => i.classList.remove('text-[var(--text-active)]', 'border-l-2', 'border-[var(--text-active)]'));
 
-                if (isActive) {
-                    sidebarExplorer.classList.add('hidden');
-                } else {
-                    sidebarExplorer.classList.remove('hidden');
+                if (isHidden) {
+                    sidebarExplorer.style.display = 'flex';
                     document.getElementById('icon-files').classList.add('text-[var(--text-active)]', 'border-l-2', 'border-[var(--text-active)]');
+                } else {
+                    sidebarExplorer.style.display = 'none';
                 }
             });
 
             // Collapse from Explorer Header
             document.getElementById('btn-collapse-explorer').addEventListener('click', () => {
-                sidebarExplorer.classList.add('hidden');
+                sidebarExplorer.style.display = 'none';
                 document.querySelectorAll('.activity-icon').forEach(i => i.classList.remove('text-[var(--text-active)]', 'border-l-2', 'border-[var(--text-active)]'));
             });
 
