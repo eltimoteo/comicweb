@@ -214,9 +214,9 @@
 
                 <select id="sortSelect"
                     class="bg-[var(--bg-input)] text-[var(--text-main)] text-xs p-1 border border-[var(--border)] outline-none">
-                    <option value="title">sort: title.asc</option>
-                    <option value="year">sort: year.desc</option>
-                    <option value="rating">sort: rating.desc</option>
+                    <option value="title">sort: title</option>
+                    <option value="year">sort: year</option>
+                    <option value="rating">sort: rating</option>
                 </select>
 
                 <button id="orderBtn" class="text-left text-xs text-[var(--keyword)] hover:underline">
@@ -649,7 +649,7 @@
                         
                         <div class="pl-4 ml-1" style="border-left: 1px solid var(--border)">
                             <div><span style="color: var(--variable)">author</span>: <span style="color: var(--string)">"${comic.WRITER}"</span>;</div>
-                            <div><span style="color: var(--variable)">year</span>: <span style="color: var(--number)">${(comic.PUBLISH || '').match(/\\d{4}/)?.[0] || 'null'}</span>;</div>
+                            <div><span style="color: var(--variable)">year</span>: <span style="color: var(--number)">${(comic.PUBLISH || '').match(/\d{4}/)?.[0] || 'null'}</span>;</div>
                             <div><span style="color: var(--variable)">read</span>: <span style="color: var(--keyword)">${isRead}</span>;</div>
                             ${comic.RATING ? `<div><span style="color: var(--variable)">rating</span>: <span style="color: var(--number)">${comic.RATING}</span>;</div>` : ''}
                         </div>
