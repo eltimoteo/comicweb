@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Comic Collection</title>
+    <!-- Tailwind CSS for styling -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- PapaParse for reading CSVs -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.0/papaparse.min.js"></script>
+    <!-- Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+
+    <style>
+        body {
+            background-color: #1a202c;
+            color: #e2e8f0;
+        }
+
+        .comic-card {
+            transition: transform 0.2s;
+        }
+
+        .comic-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .rating-star {
+            color: #ecc94b;
+        }
+
+        .pill {
+            font-size: 0.75rem;
+            padding: 2px 8px;
+            border-radius: 9999px;
+            font-weight: 600;
+        }
+    </style>
+</head>
+
+<body class="p-6">
+
+    <div class="max-w-7xl mx-auto">
+        <!-- Header -->
+        <header class="mb-8 text-center">
+            <h1 class="text-4xl font-bold mb-2 text-blue-400"><i class="fa-solid fa-book-open"></i> Comic Tracker</h1>
+            <p class="text-gray-400">Live Database Visualization</p>
+        </header>
+
+        <!-- Navigation Tabs -->
+        <div class="flex justify-center gap-4 mb-8">
+            <button onclick="loadSheet('marvel')" id="btn-marvel"
+                class="px-6 py-2 rounded-lg bg-red-600 hover:bg-red-700 font-bold transition">MARVEL</button>
+            <button onclick="loadSheet('dc')" id="btn-dc"
+                class="px-6 py-2 rounded-lg bg-blue-600 hover:bg-blue-700 font-bold transition">DC</button>
+            <button onclick="loadSheet('others')" id="btn-others"
+                class="px-6 py-2 rounded-lg bg-purple-600 hover:bg-purple-700 font-bold transition">OTHERS</button>
+        </div>
+
+        <!-- Search & Filter -->
+        <div class="mb-6 flex gap-4">
+            <input type="text" id="searchInput" placeholder="Search title, writer, character..."
+                class="w-full p-3 rounded bg-gray-700 border border-gray-600 text-white focus:outline-none focus:border-blue-400">
+            <select id="readFilter" class="p-3 rounded bg-gray-700 border border-gray-600 text-white">
+                <option value="all">All Status</option>
+                <option value="read">Read Only</option>
+                <option value="unread">Unread</option>
+            </select>
+        </div>
+
+        <!-- Stats Bar -->
+        <div id="statsBar" class="mb-6 text-sm text-gray-400 text-right"></div>
+
+        <!-- Loading Spinner -->
+        <div id="loading" class="text-center py-10 hidden">
+            <i class="fa-solid fa-circle-notch fa-spin text-3xl text-blue-400"></i>
+        </div>
+
+        <!-- Grid Container -->
+        <div id="comicGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+            <!-- Cards injected here -->
+        </div>
+    </div>
+
+    <script>
+        // --- CONFIGURATION: PASTE YOUR SHEET IDs HERE ---
+        const sheetConfig = {
+            marvel: "https://docs.google.com/spreadsheets/d/e/2PACX-1vTFTPLKwr0aJgqiW3fPIbp5SvHLSDu6mPGnILzw9uMBKWfw7VdNykUY4NLiGNcb4dU3VI7XLkO8iSqX/pub?gid=61223904&single=true&output=csv",
+            dc: "https://docs.google.com/spreadsheets/d/e/2PACX-1vTFTPLKwr0aJgqiW3fPIbp5SvHLSDu6mPGnILzw9uMBKWfw7VdNykUY4NLiGNcb4dU3VI7XLkO8iSqX/pub?gid=0&single=true&output=csv",
+            others: "https://docs.google.com/spreadsheets/d/e/2PACX-1vTFTPLKwr0aJgqiW3fPIbp5SvHLSDu6mPGnILzw9uMBKWfw7VdNykUY4NLiGNcb4dU3VI7XLkO8iSqX/pub?gid=1684289763&single=true&output=csv"
+        };
+        // ------------------------------------------------
+
+        let currentData = [];
+        let currentTab = 'marvel';
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', () => {
+            loadSheet('marvel');
+
+            // Search Listener
+            document.getElementById('searchInput').addEventListener('input', renderComics);
+            document.getElementById('readFilter').addEventListener('change', renderComics);
+        });
+
+        function loadSheet(key) {
+            currentTab = key;
+            const grid = document.getElementById('comicGrid');
+            const loader = document.getElementById('loading');
+
+            // UI Updates
+            document.querySelectorAll('button').forEach(b => b.classList.remove('ring-4', 'ring-white'));
+            document.getElementById(`btn-${key}`).classList.add('ring-4', 'ring-white');
+
+            grid.innerHTML = '';
+            loader.classList.remove('hidden');
+
+            const sheetId = sheetConfig[key];
+            const csvUrl = `https://docs.google.com/spreadsheets/d/${sheetId}/pub?output=csv`;
+
+            Papa.parse(csvUrl, {
+                download: true,
+                header: true,
+                complete: function (results) {
+                    currentData = results.data;
+                    loader.classList.add('hidden');
+                    renderComics();
+                },
+                error: function (err) {
+                    loader.classList.add('hidden');
+                    grid.innerHTML = `<div class="col-span-full text-center text-red-400">Error loading sheet. Check your ID and ensure "Publish to Web" is active.</div>`;
+                }
+            });
+        }
+
+        function renderComics() {
+            const grid = document.getElementById('comicGrid');
+            const search = document.getElementById('searchInput').value.toLowerCase();
+            const filter = document.getElementById('readFilter').value;
+
+            grid.innerHTML = '';
+
+            // Filter Logic
+            const filtered = currentData.filter(row => {
+                if (!row.TITLE) return false; // Skip empty rows
+
+                const textMatch = (
+                    (row.TITLE || '').toLowerCase().includes(search) ||
+                    (row.WRITER || '').toLowerCase().includes(search) ||
+                    (row.CHARACTER || '').toLowerCase().includes(search)
+                );
+
+                const isRead = (row.READ || '').toString().toUpperCase() === 'TRUE';
+
+                let readMatch = true;
+                if (filter === 'read') readMatch = isRead;
+                if (filter === 'unread') readMatch = !isRead;
+
+                return textMatch && readMatch;
+            });
+
+            // Update Stats
+            document.getElementById('statsBar').innerHTML = `Showing ${filtered.length} comics`;
+
+            // Render Cards
+            filtered.forEach(comic => {
+                const isRead = (comic.READ || '').toString().toUpperCase() === 'TRUE';
+                const isOwned = (comic.OWN || '').toString().toUpperCase() === 'TRUE';
+
+                // Color Logic based on sheet
+                let borderColor = currentTab === 'marvel' ? 'border-red-500' : (currentTab === 'dc' ? 'border-blue-500' : 'border-purple-500');
+
+                const card = document.createElement('div');
+                card.className = `comic-card bg-gray-800 rounded-lg p-5 border-l-4 ${borderColor} shadow-lg flex flex-col justify-between`;
+
+                card.innerHTML = `
+                    <div>
+                        <div class="flex justify-between items-start mb-2">
+                            <span class="pill ${isOwned ? 'bg-green-900 text-green-200' : 'bg-gray-700 text-gray-400'}">
+                                ${isOwned ? 'OWNED' : 'DIGITAL'}
+                            </span>
+                            <span class="text-xs text-gray-400">${comic.PUBLISH || ''}</span>
+                        </div>
+                        
+                        <h3 class="text-xl font-bold text-white mb-1 leading-tight">${comic.TITLE}</h3>
+                        <p class="text-sm text-gray-400 mb-3">by ${comic.WRITER} & ${comic.ARTIST}</p>
+
+                        <div class="flex flex-wrap gap-2 mb-4">
+                            ${comic.CHARACTER ? `<span class="pill bg-gray-700 text-blue-300">${comic.CHARACTER}</span>` : ''}
+                            ${comic.IMPRINT ? `<span class="pill bg-gray-700 text-pink-300">${comic.IMPRINT}</span>` : ''}
+                        </div>
+                        
+                        ${comic.NOTE ? `<p class="text-xs text-gray-400 italic mb-3">"${comic.NOTE}"</p>` : ''}
+                    </div>
+
+                    <div class="mt-4 pt-4 border-t border-gray-700 flex justify-between items-center">
+                        <div class="flex items-center gap-2">
+                            ${isRead
+                        ? `<i class="fa-solid fa-check-circle text-green-500"></i> <span class="text-sm">Read</span>`
+                        : `<i class="fa-regular fa-circle text-gray-500"></i> <span class="text-sm">Unread</span>`
+                    }
+                            ${comic.RATING ? `<span class="ml-2 text-yellow-400 font-bold"><i class="fa-solid fa-star"></i> ${comic.RATING}</span>` : ''}
+                        </div>
+                        
+                        ${comic.LINK ? `
+                            <a href="${comic.LINK}" target="_blank" class="text-blue-400 hover:text-white transition">
+                                <i class="fa-solid fa-external-link-alt"></i>
+                            </a>
+                        ` : ''}
+                    </div>
+                `;
+                grid.appendChild(card);
+            });
+        }
+    </script>
+</body>
+
+</html>
