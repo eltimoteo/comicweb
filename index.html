@@ -28,6 +28,7 @@
             --accent: #007acc;
             --text-main: #d4d4d4;
             --text-muted: #858585;
+            --text-active: #ffffff;
             
             /* Syntax Highlighting */
             --keyword: #569cd6;      /* Blue */
@@ -76,7 +77,7 @@
     <div id="splash" class="fixed inset-0 z-50 bg-[var(--bg-editor)] flex items-center justify-center font-mono text-lg">
         <div class="w-full max-w-2xl p-10">
             <div id="terminal-text" class="text-green-500 mb-2"></div>
-            <div class="text-gray-500 text-sm mt-4 hidden" id="splash-footer">Initializing environment... v1.42.0</div>
+            <div class="text-[var(--text-muted)] text-sm mt-4 hidden" id="splash-footer">Initializing environment... v1.42.0</div>
         </div>
     </div>
 
@@ -121,7 +122,10 @@
 
         <!-- Sidebar (File Explorer) -->
         <div id="sidebar-panel" class="w-64 bg-[var(--bg-sidebar)] flex flex-col text-sm border-r border-[var(--bg-editor)] hidden md:flex">
-            <div class="px-4 py-2 uppercase text-xs font-bold text-[var(--text-muted)] tracking-wider">Explorer</div>
+            <div class="px-4 py-2 flex items-center justify-between uppercase text-xs font-bold text-[var(--text-muted)] tracking-wider">
+                <span>Explorer</span>
+                <i id="btn-collapse-explorer" class="fa-solid fa-ellipsis hover:text-white cursor-pointer" title="More Actions"></i>
+            </div>
             
             <!-- Open Editors -->
             <div class="px-4 py-1 flex items-center gap-1 bg-[var(--bg-item-active)] text-white">
@@ -171,27 +175,51 @@
         <div class="flex-1 flex flex-col bg-[var(--bg-editor)] overflow-hidden">
             <!-- Tabs Header -->
             <div class="h-9 bg-[var(--bg-panel)] flex items-center overflow-x-auto text-sm border-b border-[var(--border)]">
-                <div id="tab-label" class="bg-[var(--bg-editor)] text-[var(--text-main)] px-4 h-full flex items-center border-t-2 border-[var(--accent)] gap-2 pr-8 relative">
+                <div id="tab-main" onclick="loadSheet(currentTab)" class="cursor-pointer" class="bg-[var(--bg-editor)] text-[var(--text-main)] px-4 h-full flex items-center border-t-2 border-[var(--accent)] gap-2 pr-8 relative">
                     <i class="fa-brands fa-js text-yellow-500"></i>
                     <span>main.js</span>
-                    <i class="fa-solid fa-xmark text-gray-500 hover:text-white absolute right-2 text-xs"></i>
+                    <i class="fa-solid fa-xmark text-[var(--text-muted)] hover:text-white absolute right-2 text-xs"></i>
                 </div>
-                <!-- Fake inactive tab -->
-                <div class="bg-[var(--bg-panel)] text-gray-500 px-4 h-full flex items-center gap-2 border-r border-[var(--bg-sidebar)]">
-                    <i class="fa-solid fa-file-lines"></i>
+                <!-- Readme Tab -->
+                <div id="tab-readme" onclick="loadReadme()" class="cursor-pointer bg-[var(--bg-panel)] text-[var(--text-muted)] px-4 h-full flex items-center gap-2 border-r border-[var(--bg-sidebar)]">
+                    <i class="fa-solid fa-file-lines text-blue-400"></i>
                     <span>README.md</span>
                 </div>
             </div>
 
             <!-- Breadcrumbs -->
-            <div class="h-6 flex items-center px-4 text-xs text-gray-500 gap-1 bg-[var(--bg-editor)]">
+            <div class="h-6 flex items-center px-4 text-xs text-[var(--text-muted)] gap-1 bg-[var(--bg-editor)]">
                 <span>src</span> <i class="fa-solid fa-chevron-right text-[10px]"></i>
                 <span>components</span> <i class="fa-solid fa-chevron-right text-[10px]"></i>
                 <span id="crumb-active" class="text-white">marvel_comics.js</span>
-                <span id="statsBar" class="ml-auto text-xs text-gray-500">Loading...</span>
+                <span id="statsBar" class="ml-auto text-xs text-[var(--text-muted)]">Loading...</span>
             </div>
 
             <!-- Grid Content -->
+                        <!-- README / About Me Content -->
+            <div id="readme-container" class="hidden flex-1 overflow-y-auto p-8 font-serif bg-[var(--bg-editor)] text-[var(--text-main)]">
+                <div class="max-w-3xl mx-auto">
+                    <h1 class="text-4xl font-bold mb-6 border-b border-[var(--border)] pb-4">About Me</h1>
+                    <p class="mb-4 text-lg leading-relaxed">
+                        Hi, I'm <span class="text-[var(--accent)] font-bold">Timothy</span>. Welcome to my comic collection tracker!
+                    </p>
+                    <p class="mb-4 text-lg leading-relaxed">
+                        I built this application to catalog my growing collection of Marvel and DC comics. 
+                        It connects directly to my Google Sheets database and provides a developer-centric interface for browsing.
+                    </p>
+                    <h2 class="text-2xl font-bold mt-8 mb-4">Tech Stack</h2>
+                    <ul class="list-disc pl-6 space-y-2 mb-8">
+                        <li><strong>Frontend:</strong> HTML5, Tailwind CSS, Vanilla JS</li>
+                        <li><strong>Data:</strong> Google Sheets CSV API + PapaParse</li>
+                        <li><strong>Design:</strong> VSCode Dark+ Theme (Custom Implementation)</li>
+                    </ul>
+                    <div class="p-4 bg-[var(--bg-item-active)] rounded-lg border-l-4 border-[var(--accent)]">
+                        <p class="italic">"With great power comes great responsibility."</p>
+                        <p class="text-right text-sm mt-2">- Uncle Ben</p>
+                    </div>
+                </div>
+            </div>
+
             <div class="flex-1 overflow-y-auto p-4 md:p-6" id="scroll-container">
                 <div id="loading" class="hidden text-center py-10">
                     <div class="text-[var(--keyword)]">Loading modules...</div>
@@ -221,7 +249,7 @@
 
     <!-- Settings Modal -->
     <div id="settings-modal" class="hidden absolute bottom-12 left-12 w-64 bg-[var(--bg-sidebar)] border border-[var(--border)] shadow-2xl z-50 text-sm">
-        <div class="p-2 text-xs text-gray-500 font-bold uppercase tracking-wider border-b border-[var(--border)]">Preferences</div>
+        <div class="p-2 text-xs text-[var(--text-muted)] font-bold uppercase tracking-wider border-b border-[var(--border)]">Preferences</div>
         <div class="p-2">
             <div class="mb-2 text-[var(--text-main)]">Color Theme</div>
             <select id="themeSelect" class="w-full bg-[var(--bg-input)] text-white p-1 border border-[var(--border)] outline-none hover:border-[var(--accent)]">
@@ -234,7 +262,7 @@
         </div>
         <div class="border-t border-[var(--border)] p-2 hover:bg-[var(--bg-item-hover)] cursor-pointer text-[var(--text-main)] flex items-center justify-between group">
             <span>Keyboard Shortcuts</span>
-            <span class="text-xs text-gray-500 group-hover:text-white">⌘K ⌘S</span>
+            <span class="text-xs text-[var(--text-muted)] group-hover:text-white">⌘K ⌘S</span>
         </div>
     </div>
 
@@ -257,7 +285,7 @@
             'light-plus': {
                 '--bg-editor': '#ffffff', '--bg-sidebar': '#f3f3f3', '--bg-activity': '#2c2c2c', 
                 '--bg-panel': '#f3f3f3', '--bg-input': '#ffffff', '--bg-item-hover': '#e8e8e8', '--bg-item-active': '#007acc33',
-                '--border': '#e4e4e4', '--accent': '#007acc', '--text-main': '#333333', '--text-muted': '#666666',
+                '--border': '#e4e4e4', '--accent': '#007acc', '--text-main': '#333333', '--text-muted': '#666666', '--text-active': '#333333',
                 '--keyword': '#0000ff', '--string': '#a31515', '--function': '#795e26', '--number': '#098658', '--type': '#267f99', '--variable': '#001080'
             },
             'monokai': {
@@ -355,21 +383,21 @@
             // Files Icon -> Toggle Explorer
             document.getElementById('icon-files').addEventListener('click', (e) => {
                 const isActive = !sidebarExplorer.classList.contains('hidden');
-                document.querySelectorAll('.activity-icon').forEach(i => i.classList.remove('text-white', 'border-l-2', 'border-white'));
+                document.querySelectorAll('.activity-icon').forEach(i => i.classList.remove('text-[var(--text-active)]', 'border-l-2', 'border-[var(--text-active)]'));
 
                 if (isActive) {
                     sidebarExplorer.classList.add('hidden');
                 } else {
                     sidebarExplorer.classList.remove('hidden');
-                    document.getElementById('icon-files').classList.add('text-white', 'border-l-2', 'border-white');
+                    document.getElementById('icon-files').classList.add('text-[var(--text-active)]', 'border-l-2', 'border-[var(--text-active)]');
                 }
             });
 
             // Search Icon -> Focus Search
             document.getElementById('icon-search').addEventListener('click', () => {
                  document.getElementById('searchInput').focus();
-                 document.querySelectorAll('.activity-icon').forEach(i => i.classList.remove('text-white', 'border-l-2', 'border-white'));
-                 document.getElementById('icon-search').classList.add('text-white', 'border-l-2', 'border-white');
+                 document.querySelectorAll('.activity-icon').forEach(i => i.classList.remove('text-[var(--text-active)]', 'border-l-2', 'border-[var(--text-active)]'));
+                 document.getElementById('icon-search').classList.add('text-[var(--text-active)]', 'border-l-2', 'border-[var(--text-active)]');
             });
             
             // Git Icon
@@ -420,17 +448,52 @@
             });
         });
 
+        
+        function loadReadme() {
+            // Update UI for Readme Mode
+            document.getElementById('scroll-container').classList.add('hidden');
+            document.getElementById('readme-container').classList.remove('hidden');
+            
+            // Deselect Sidebars
+             document.querySelectorAll('[id^="btn-"]').forEach(el => {
+                el.classList.remove('bg-[var(--bg-item-active)]', 'text-[var(--text-active)]');
+                el.classList.add('text-[var(--text-main)]');
+            });
+            
+            // Tab Header Styles
+            document.getElementById('tab-main').classList.remove('border-t-2', 'border-[var(--accent)]', 'bg-[var(--bg-editor)]', 'text-[var(--text-main)]');
+            document.getElementById('tab-main').classList.add('bg-[var(--bg-panel)]', 'text-[var(--text-muted)]', 'border-r', 'border-[var(--bg-sidebar)]'); // Inactive style
+            
+            document.getElementById('tab-readme').classList.add('bg-[var(--bg-editor)]', 'text-[var(--text-main)]', 'border-t-2', 'border-[var(--accent)]');
+            document.getElementById('tab-readme').classList.remove('bg-[var(--bg-panel)]', 'text-[var(--text-muted)]', 'border-r');
+            
+            // Update Breadcrumbs
+            document.getElementById('crumb-active').innerText = "README.md";
+            document.getElementById('statsBar').innerText = "Markdown Preview";
+        }
+
         function loadSheet(key) {
+            // Hide Readme, Show Grid
+            document.getElementById('readme-container').classList.add('hidden');
+            document.getElementById('scroll-container').classList.remove('hidden');
+            
+            // Update Tab Header Styles
+            document.getElementById('tab-readme').classList.remove('border-t-2', 'border-[var(--accent)]', 'bg-[var(--bg-editor)]', 'text-[var(--text-main)]');
+            document.getElementById('tab-readme').classList.add('bg-[var(--bg-panel)]', 'text-[var(--text-muted)]', 'border-r', 'border-[var(--bg-sidebar)]');
+            
+            document.getElementById('tab-main').classList.add('bg-[var(--bg-editor)]', 'text-[var(--text-main)]', 'border-t-2', 'border-[var(--accent)]');
+            document.getElementById('tab-main').classList.remove('bg-[var(--bg-panel)]', 'text-[var(--text-muted)]', 'border-r');
+
             currentTab = key;
             const grid = document.getElementById('comicGrid');
 
             // Update Active State in Sidebar
             document.querySelectorAll('[id^="btn-"]').forEach(el => {
-                el.classList.remove('bg-[var(--bg-item-active)]', 'text-white');
+                el.classList.remove('bg-[var(--bg-item-active)]', 'text-[var(--text-active)]');
                 el.classList.add('text-[var(--text-main)]');
             });
             const activeBtn = document.getElementById(`btn-${key}`);
-            activeBtn.classList.add('bg-[var(--bg-item-active)]', 'text-white');
+            activeBtn.classList.add('bg-[var(--bg-item-active)]', 'text-[var(--text-active)]');
             activeBtn.classList.remove('text-[var(--text-main)]');
             
             // Update Breadcrumb & Tab (Also update icon color based on JS/JSON)
