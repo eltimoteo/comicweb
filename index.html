@@ -185,6 +185,11 @@
 
                 card.innerHTML = `
                     <div>
+                        ${comic.IMAGE ? `
+                        <div class="mb-4 h-64 overflow-hidden rounded-lg">
+                             <img src="${comic.IMAGE}" alt="${comic.TITLE}" class="w-full h-full object-cover transform hover:scale-105 transition duration-500">
+                        </div>` : ''}
+
                         <div class="flex justify-between items-start mb-2">
                             <span class="pill ${isOwned ? 'bg-green-900 text-green-200' : 'bg-gray-700 text-gray-400'}">
                                 ${isOwned ? 'OWNED' : 'DIGITAL'}
