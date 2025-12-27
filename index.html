@@ -4,201 +4,267 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>My Comic Database</title>
+    <title>ComicDB - VSCode Mode</title>
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.0/papaparse.min.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-
-    <!-- Google Fonts: Atkinson Hyperlegible -->
+    
+    <!-- Fonts: Atkinson Hyperlegible Mono (User Request) -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link
-        href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible+Mono:ital,wght@0,200..800;1,200..800&display=swap"
-        rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible+Mono:wght@400;700&display=swap" rel="stylesheet">
 
     <style>
-        body {
-            font-family: 'Atkinson Hyperlegible Mono', sans-serif;
-            background-color: #0f172a;
-            color: #e2e8f0;
-            /* Deep modern gradient */
-            background-image:
-                radial-gradient(at 0% 0%, rgba(56, 189, 248, 0.1) 0px, transparent 50%),
-                radial-gradient(at 100% 0%, rgba(139, 92, 246, 0.1) 0px, transparent 50%);
-            background-attachment: fixed;
+        :root {
+            --bg-editor: #1e1e1e;
+            --bg-sidebar: #252526;
+            --bg-activity: #333333;
+            --border: #3e3e42;
+            --accent: #007acc;
+            --text-main: #d4d4d4;
+            --keyword: #569cd6;      /* Blue */
+            --string: #ce9178;       /* Orange/Brown */
+            --function: #dcdcaa;     /* Yellow */
+            --comment: #6a9955;      /* Green */
+            --number: #b5cea8;       /* Light Green */
         }
+
+        body {
+            font-family: 'Atkinson Hyperlegible Mono', monospace;
+            background-color: var(--bg-editor);
+            color: var(--text-main);
+        }
+
+        /* Splash Screen Typing Cursor */
+        .cursor::after {
+            content: '█';
+            animation: blink 1s step-end infinite;
+        }
+        @keyframes blink { 50% { opacity: 0; } }
 
         /* Custom Scrollbar */
-        ::-webkit-scrollbar {
-            width: 8px;
-        }
+        ::-webkit-scrollbar { width: 10px; }
+        ::-webkit-scrollbar-track { background: var(--bg-editor); }
+        ::-webkit-scrollbar-thumb { background: #424242; }
+        ::-webkit-scrollbar-thumb:hover { background: #4f4f4f; }
 
-        ::-webkit-scrollbar-track {
-            background: #0f172a;
+        /* Utilities */
+        .vscode-border { border: 1px solid var(--border); }
+        .vscode-card { background-color: var(--bg-sidebar); }
+        .vscode-input { 
+            background-color: var(--activity); 
+            border: 1px solid var(--border); 
+            color: var(--text-main);
         }
-
-        ::-webkit-scrollbar-thumb {
-            background: #334155;
-            border-radius: 4px;
-        }
-
-        ::-webkit-scrollbar-thumb:hover {
-            background: #475569;
-        }
-
-        .glass-panel {
-            background: rgba(30, 41, 59, 0.7);
-            backdrop-filter: blur(12px);
-            -webkit-backdrop-filter: blur(12px);
-            border: 1px solid rgba(255, 255, 255, 0.08);
-        }
-
-        .comic-card {
-            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-        }
-
-        .comic-card:hover {
-            transform: translateY(-8px) scale(1.02);
-            box-shadow: 0 20px 40px -10px rgba(0, 0, 0, 0.5);
-        }
-
-        /* Input Auto-fill fix for dark mode */
-        input:-webkit-autofill,
-        input:-webkit-autofill:hover,
-        input:-webkit-autofill:focus,
-        input:-webkit-autofill:active {
-            -webkit-box-shadow: 0 0 0 30px #1e293b inset !important;
-            -webkit-text-fill-color: white !important;
-            transition: background-color 5000s ease-in-out 0s;
-        }
+        .vscode-input:focus { border-color: var(--accent); outline: none; }
     </style>
 </head>
 
-<body class="min-h-screen p-4 md:p-10 selection:bg-blue-500 selection:text-white">
+<body class="h-screen overflow-hidden flex flex-col">
 
-    <div class="max-w-8xl mx-auto">
+    <!-- SPLASH SCREEN -->
+    <div id="splash" class="fixed inset-0 z-50 bg-[#1e1e1e] flex items-center justify-center font-mono text-lg">
+        <div class="w-full max-w-2xl p-10">
+            <div id="terminal-text" class="text-green-500 mb-2"></div>
+            <div class="text-gray-500 text-sm mt-4 hidden" id="splash-footer">Initializing environment... v1.42.0</div>
+        </div>
+    </div>
 
-        <!-- Interactive Background Patterns -->
-        <div class="fixed inset-0 pointer-events-none opacity-20"
-            style="background-image: url('data:image/svg+xml,%3Csvg width=\'60\' height=\'60\' viewBox=\'0 0 60 60\' xmlns=\'http://www.w3.org/2000/svg\'%3E%3Cg fill=\'none\' fill-rule=\'evenodd\'%3E%3Cg fill=\'%239C92AC\' fill-opacity=\'0.1\'%3E%3Cpath d=\'M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z\'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E'); z-index: -1;">
+    <!-- VSCode Title Bar (Fake) -->
+    <div class="h-8 bg-[#3c3c3c] flex items-center justify-between px-4 text-xs select-none">
+        <div class="flex gap-4">
+            <span class="font-bold">ComicDB.code-workspace</span>
+            <span class="text-gray-400">File</span>
+            <span class="text-gray-400">Edit</span>
+            <span class="text-gray-400">Selection</span>
+            <span class="text-gray-400">View</span>
+        </div>
+        
+        <!-- Command Palette / Search (Centered) -->
+        <div class="flex-1 max-w-xl mx-4 relative">
+             <div class="bg-[#2d2d2d] rounded-md border border-[#4e4e4e] flex items-center px-2 py-0.5 w-full">
+                <i class="fa-solid fa-search text-gray-400 text-xs mr-2"></i>
+                <input type="text" id="searchInput" placeholder="Search files (Ctrl+P)"
+                    class="bg-transparent border-none text-gray-300 text-xs w-full focus:outline-none placeholder-gray-500">
+             </div>
         </div>
 
-        <!-- Header -->
-        <header class="mb-12 text-center relative">
-            <div class="inline-block relative">
-                <span
-                    class="absolute -inset-1 bg-gradient-to-r from-blue-600 to-purple-600 blur opacity-40 animate-pulse"></span>
-                <h1
-                    class="relative text-5xl md:text-7xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-blue-300 via-white to-purple-300 tracking-tight mb-2">
-                    COMIC<span class="font-light text-white/50"> WEB</span>
-                </h1>
+        <div class="flex gap-3 text-gray-400">
+             <i class="fa-solid fa-window-minimize hover:text-white"></i>
+             <i class="fa-regular fa-square hover:text-white"></i>
+             <i class="fa-solid fa-xmark hover:text-white"></i>
+        </div>
+    </div>
+
+    <!-- Main Layout -->
+    <div class="flex flex-1 overflow-hidden">
+        
+        <!-- Activity Bar (Left Sidebar) -->
+        <div class="w-12 bg-[#333333] flex flex-col items-center py-4 gap-6 text-[#858585] text-xl border-r border-[#252526]">
+            <i class="fa-solid fa-files text-white border-l-2 border-white pl-3 pr-4 py-1"></i> <!-- Explorer -->
+            <i class="fa-solid fa-search hover:text-white transition cursor-pointer"></i>
+            <i class="fa-solid fa-code-branch hover:text-white transition cursor-pointer"></i>
+            <i class="fa-solid fa-bug hover:text-white transition cursor-pointer"></i>
+            <div class="flex-1"></div>
+            <i class="fa-solid fa-gear hover:text-white transition cursor-pointer mb-2"></i>
+        </div>
+
+        <!-- Sidebar (File Explorer) -->
+        <div class="w-64 bg-[#252526] flex flex-col text-sm border-r border-[#1e1e1e] hidden md:flex">
+            <div class="px-4 py-2 uppercase text-xs font-bold text-gray-400 tracking-wider">Explorer</div>
+            
+            <!-- Open Editors -->
+            <div class="px-4 py-1 flex items-center gap-1 bg-[#37373d] text-white">
+                <i class="fa-solid fa-chevron-down text-[10px]"></i> 
+                <span class="font-bold">OPEN COMICS</span>
             </div>
-            <p class="text-slate-400 font-light tracking-widest uppercase text-sm mt-2">Timothy R. Huang's Collection
-            </p>
-        </header>
-
-        <!-- Main Controls Container -->
-        <div class="glass-panel rounded-2xl p-4 mb-10 sticky top-4 z-40 shadow-2xl">
-            <div class="flex flex-col md:flex-row gap-4 justify-between items-center">
-
-                <!-- Tab Switching -->
-                <div class="flex p-1 bg-slate-900/50 rounded-xl w-full md:w-auto overflow-x-auto">
-                    <button onclick="loadSheet('marvel')" id="btn-marvel"
-                        class="flex-1 md:flex-none px-6 py-2.5 rounded-lg text-sm font-bold tracking-wide transition-all duration-300 hover:text-white text-slate-400">
-                        MARVEL
-                    </button>
-                    <button onclick="loadSheet('dc')" id="btn-dc"
-                        class="flex-1 md:flex-none px-6 py-2.5 rounded-lg text-sm font-bold tracking-wide transition-all duration-300 hover:text-white text-slate-400">
-                        DC
-                    </button>
-                    <button onclick="loadSheet('others')" id="btn-others"
-                        class="flex-1 md:flex-none px-6 py-2.5 rounded-lg text-sm font-bold tracking-wide transition-all duration-300 hover:text-white text-slate-400">
-                        INDEPENDENT
-                    </button>
+            
+            <!-- Folder Structure (Tabs) -->
+            <div class="mt-2 pl-2">
+                <div onclick="loadSheet('marvel')" id="btn-marvel" class="cursor-pointer px-2 py-1 flex items-center gap-2 hover:bg-[#2a2d2e] text-[#d4d4d4]">
+                    <i class="fa-brands fa-js text-[#f1e05a]"></i> <!-- JS Icon for marvel -->
+                    <span>marvel_comics.js</span>
+                    <span id="badge-marvel" class="ml-auto text-[10px] bg-[#007acc] text-white px-1.5 rounded-full hidden">A</span>
                 </div>
-
-                <!-- Filters & Search -->
-                <div class="flex flex-wrap gap-2 w-full md:w-auto">
-                    <!-- Search -->
-                    <div class="relative group flex-grow md:flex-grow-0 md:w-64">
-                        <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                            <i
-                                class="fa-solid fa-search text-slate-500 group-focus-within:text-blue-400 transition"></i>
-                        </div>
-                        <input type="text" id="searchInput" placeholder="Search collection..."
-                            class="w-full bg-slate-800/50 border border-slate-700 text-white text-sm rounded-lg block pl-10 p-2.5 focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500 outline-none transition-all placeholder-slate-500 hover:bg-slate-800">
-                    </div>
-
-                    <!-- Filter Dropdown -->
-                    <div class="relative group">
-                        <select id="readFilter"
-                            class="bg-slate-800/50 border border-slate-700 text-white text-sm rounded-lg focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500 block w-full p-2.5 outline-none hover:bg-slate-800 cursor-pointer appearance-none pr-8">
-                            <option value="all">Status: All</option>
-                            <option value="read">Status: Read</option>
-                            <option value="unread">Status: Unread</option>
-                        </select>
-                        <i
-                            class="fa-solid fa-chevron-down absolute right-3 top-3 text-xs text-slate-500 pointer-events-none"></i>
-                    </div>
-
-                    <!-- Sort Dropdown -->
-                    <div class="relative group">
-                        <select id="sortSelect"
-                            class="bg-slate-800/50 border border-slate-700 text-white text-sm rounded-lg focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500 block w-full p-2.5 outline-none hover:bg-slate-800 cursor-pointer appearance-none pr-8">
-                            <option value="title">Sort: Title</option>
-                            <option value="year">Sort: Year</option>
-                            <option value="rating">Sort: Rating</option>
-                            <option value="imprint">Sort: Imprint</option>
-                            <option value="character">Sort: Character</option>
-                        </select>
-                        <i
-                            class="fa-solid fa-chevron-down absolute right-3 top-3 text-xs text-slate-500 pointer-events-none"></i>
-                    </div>
-
-                    <!-- Order Toggle -->
-                    <button id="orderBtn"
-                        class="p-2.5 rounded-lg bg-slate-800/50 border border-slate-700 text-slate-400 hover:text-white hover:bg-slate-700 hover:border-slate-500 transition-all active:scale-95"
-                        title="Toggle Order">
-                        <i class="fa-solid fa-arrow-down-a-z"></i>
-                    </button>
+                <div onclick="loadSheet('dc')" id="btn-dc" class="cursor-pointer px-2 py-1 flex items-center gap-2 hover:bg-[#2a2d2e] text-[#d4d4d4]">
+                    <i class="fa-brands fa-js text-[#f1e05a]"></i>
+                    <span>dc_universe.js</span>
+                </div>
+                <div onclick="loadSheet('others')" id="btn-others" class="cursor-pointer px-2 py-1 flex items-center gap-2 hover:bg-[#2a2d2e] text-[#d4d4d4]">
+                    <i class="fa-solid fa-file-code text-blue-400"></i>
+                    <span>indie_reads.json</span>
                 </div>
             </div>
+
+            <div class="mt-6 px-4 py-2 uppercase text-xs font-bold text-gray-400 tracking-wider">Properties</div>
+             <!-- Filters in Sidebar -->
+             <div class="px-4 py-2 gap-3 flex flex-col">
+                 <select id="readFilter" class="bg-[#3c3c3c] text-gray-300 text-xs p-1 border border-[#3e3e42] outline-none">
+                     <option value="all">filter: all</option>
+                     <option value="read">filter: read</option>
+                     <option value="unread">filter: unread</option>
+                 </select>
+                 
+                 <select id="sortSelect" class="bg-[#3c3c3c] text-gray-300 text-xs p-1 border border-[#3e3e42] outline-none">
+                     <option value="title">sort: title.asc</option>
+                     <option value="year">sort: year.desc</option>
+                     <option value="rating">sort: rating.desc</option>
+                 </select>
+                 
+                 <button id="orderBtn" class="text-left text-xs text-[#569cd6] hover:underline">
+                     <i class="fa-solid fa-arrow-down-a-z"></i> toggle: direction
+                 </button>
+             </div>
         </div>
 
-        <!-- Stats -->
-        <div id="statsBar" class="mb-4 px-2 text-xs font-bold text-slate-500 tracking-wider uppercase text-right"></div>
+        <!-- Editor Area (Grid) -->
+        <div class="flex-1 flex flex-col bg-[#1e1e1e] overflow-hidden">
+            <!-- Tabs Header -->
+            <div class="h-9 bg-[#2d2d2d] flex items-center overflow-x-auto text-sm border-b border-black">
+                <div id="tab-label" class="bg-[#1e1e1e] text-[#d4d4d4] px-4 h-full flex items-center border-t-2 border-[#007acc] gap-2 pr-8 relative">
+                    <i class="fa-brands fa-js text-yellow-500"></i>
+                    <span>main.js</span>
+                    <i class="fa-solid fa-xmark text-gray-500 hover:text-white absolute right-2 text-xs"></i>
+                </div>
+                <!-- Fake inactive tab -->
+                <div class="bg-[#2d2d2d] text-gray-500 px-4 h-full flex items-center gap-2 border-r border-[#252526]">
+                    <i class="fa-solid fa-file-lines"></i>
+                    <span>README.md</span>
+                </div>
+            </div>
 
-        <!-- Loading -->
-        <div id="loading" class="text-center py-20 hidden">
-            <div class="inline-flex items-center gap-3">
-                <i class="fa-solid fa-circle-notch fa-spin text-4xl text-blue-500"></i>
-                <span class="text-xl font-light text-slate-400 animate-pulse">Syncing Database...</span>
+            <!-- Breadcrumbs -->
+            <div class="h-6 flex items-center px-4 text-xs text-gray-500 gap-1 bg-[#1e1e1e]">
+                <span>src</span> <i class="fa-solid fa-chevron-right text-[10px]"></i>
+                <span>components</span> <i class="fa-solid fa-chevron-right text-[10px]"></i>
+                <span id="crumb-active" class="text-white">marvel_comics.js</span>
+                <span id="statsBar" class="ml-auto text-xs text-gray-500">Loading...</span>
+            </div>
+
+            <!-- Grid Content -->
+            <div class="flex-1 overflow-y-auto p-4 md:p-6" id="scroll-container">
+                <div id="loading" class="hidden text-center py-10">
+                    <div class="text-[#569cd6]">Loading modules...</div>
+                </div>
+
+                <div id="comicGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-4">
+                    <!-- Cards -->
+                </div>
             </div>
         </div>
+    </div>
 
-        <!-- Grid -->
-        <div id="comicGrid"
-            class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-6 pb-20">
-            <!-- Cards injected here -->
+    <!-- Status Bar -->
+    <div class="h-6 bg-[#007acc] flex items-center justify-between px-3 text-[11px] text-white">
+        <div class="flex gap-4">
+            <span><i class="fa-solid fa-code-branch text-[10px]"></i> main*</span>
+            <span><i class="fa-regular fa-circle-xmark"></i> 0</span>
+            <span><i class="fa-solid fa-triangle-exclamation"></i> 0</span>
         </div>
-
+        <div class="flex gap-4">
+            <span>Ln 12, Col 42</span>
+            <span>UTF-8</span>
+            <span>JavaScript</span>
+            <span><i class="fa-regular fa-bell"></i></span>
+        </div>
     </div>
 
     <script>
-        // --- CONFIGURATION ---
+        // --- DATA CONFIG ---
         const sheetConfig = {
             marvel: "https://docs.google.com/spreadsheets/d/e/2PACX-1vTFTPLKwr0aJgqiW3fPIbp5SvHLSDu6mPGnILzw9uMBKWfw7VdNykUY4NLiGNcb4dU3VI7XLkO8iSqX/pub?gid=61223904&single=true&output=csv",
             dc: "https://docs.google.com/spreadsheets/d/e/2PACX-1vTFTPLKwr0aJgqiW3fPIbp5SvHLSDu6mPGnILzw9uMBKWfw7VdNykUY4NLiGNcb4dU3VI7XLkO8iSqX/pub?gid=0&single=true&output=csv",
             others: "https://docs.google.com/spreadsheets/d/e/2PACX-1vTFTPLKwr0aJgqiW3fPIbp5SvHLSDu6mPGnILzw9uMBKWfw7VdNykUY4NLiGNcb4dU3VI7XLkO8iSqX/pub?gid=1684289763&single=true&output=csv"
         };
-        // ---------------------
 
         let currentData = [];
         let currentTab = 'marvel';
         let isDescending = false;
 
+        // --- SPLASH SCREEN LOGIC ---
+        async function runSplash() {
+            const terminal = document.getElementById('terminal-text');
+            const footer = document.getElementById('splash-footer');
+            const commands = [
+                "> npm install comic-db",
+                "[SUCCESS] Installed 142 packages in 0.4s",
+                "> npm run dev",
+                "> Server ready at localhost:3000..."
+            ];
+
+            for (const cmd of commands) {
+                const p = document.createElement('div');
+                p.className = cmd.startsWith(">") ? "text-white" : "text-gray-400 pl-4";
+                terminal.appendChild(p);
+                
+                // Typing effect for commands
+                if (cmd.startsWith(">")) {
+                    p.innerHTML = "> <span class='cursor'></span>";
+                    const text = cmd.substring(2);
+                    for (let i = 0; i < text.length; i++) {
+                        p.querySelector('span').textContent = text.substring(0, i + 1); // Remove cursor for now or keep it?
+                        p.innerHTML = `> ${text.substring(0, i+1)}<span class='cursor'></span>`;
+                        await new Promise(r => setTimeout(r, 30));
+                    }
+                    p.querySelector('.cursor').remove();
+                } else {
+                    p.innerText = cmd;
+                    await new Promise(r => setTimeout(r, 200));
+                }
+                await new Promise(r => setTimeout(r, 300));
+            }
+            
+            footer.classList.remove('hidden');
+            setTimeout(() => {
+                document.getElementById('splash').style.opacity = '0';
+                document.getElementById('splash').style.transition = 'opacity 0.5s';
+                setTimeout(() => document.getElementById('splash').remove(), 500);
+            }, 800);
+        }
+
         document.addEventListener('DOMContentLoaded', () => {
+            runSplash();
             loadSheet('marvel');
 
             // Listeners
@@ -207,9 +273,6 @@
             document.getElementById('sortSelect').addEventListener('change', renderComics);
             document.getElementById('orderBtn').addEventListener('click', () => {
                 isDescending = !isDescending;
-                // Rotate icon animation
-                const btn = document.getElementById('orderBtn');
-                btn.style.transform = isDescending ? "rotate(180deg)" : "rotate(0deg)";
                 renderComics();
             });
         });
@@ -217,41 +280,31 @@
         function loadSheet(key) {
             currentTab = key;
             const grid = document.getElementById('comicGrid');
-            const loader = document.getElementById('loading');
-            const stats = document.getElementById('statsBar');
 
-            // Active Tab Styling
-            document.querySelectorAll('div button[id^="btn-"]').forEach(b => {
-                b.className = "flex-1 md:flex-none px-6 py-2.5 rounded-lg text-sm font-bold tracking-wide transition-all duration-300 hover:text-white text-slate-400"; // Reset
+            // Update Active State in Sidebar
+            document.querySelectorAll('[id^="btn-"]').forEach(el => {
+                el.classList.remove('bg-[#37373d]', 'text-white');
+                el.classList.add('text-[#d4d4d4]');
             });
-
-            // Set Active Style
             const activeBtn = document.getElementById(`btn-${key}`);
-            let activeColor = key === 'marvel' ? 'bg-red-600 text-white shadow-lg shadow-red-900/40' :
-                (key === 'dc' ? 'bg-blue-600 text-white shadow-lg shadow-blue-900/40' :
-                    'bg-purple-600 text-white shadow-lg shadow-purple-900/40');
-            activeBtn.className = `flex-1 md:flex-none px-6 py-2.5 rounded-lg text-sm font-bold tracking-wide transition-all duration-300 ${activeColor} ring-1 ring-white/20`;
+            activeBtn.classList.add('bg-[#37373d]', 'text-white');
+            activeBtn.classList.remove('text-[#d4d4d4]');
+            
+            // Update Breadcrumb & Tab
+            const labels = { marvel: 'marvel_comics.js', dc: 'dc_universe.js', others: 'indie_reads.json' };
+            document.getElementById('crumb-active').innerText = labels[key];
+            document.getElementById('tab-label').querySelector('span').innerText = labels[key];
 
             grid.innerHTML = '';
-            stats.innerHTML = '';
-            loader.classList.remove('hidden');
+            document.getElementById('loading').classList.remove('hidden');
 
-            const csvUrl = sheetConfig[key];
-
-            Papa.parse(csvUrl, {
+            Papa.parse(sheetConfig[key], {
                 download: true,
                 header: true,
                 complete: function (results) {
                     currentData = results.data;
-                    loader.classList.add('hidden');
+                    document.getElementById('loading').classList.add('hidden');
                     renderComics();
-                },
-                error: function (err) {
-                    loader.classList.add('hidden');
-                    grid.innerHTML = `<div class="col-span-full py-10 text-center text-red-400 bg-red-900/10 rounded-xl border border-red-900/30">
-                        <i class="fa-solid fa-triangle-exclamation text-3xl mb-3"></i><br>
-                        Error loading database. Please check your connection.
-                    </div>`;
                 }
             });
         }
@@ -264,137 +317,69 @@
 
             grid.innerHTML = '';
 
-            // Filter
             const filtered = currentData.filter(row => {
                 if (!row.TITLE) return false;
-                const textMatch = (
-                    (row.TITLE || '').toLowerCase().includes(search) ||
-                    (row.WRITER || '').toLowerCase().includes(search) ||
-                    (row.CHARACTER || '').toLowerCase().includes(search)
-                );
-                const isRead = (row.READ || '').toString().toUpperCase() === 'TRUE';
-                let readMatch = true;
-                if (filter === 'read') readMatch = isRead;
-                if (filter === 'unread') readMatch = !isRead;
-                return textMatch && readMatch;
+                const textMatch = (row.TITLE+row.WRITER+row.CHARACTER).toLowerCase().includes(search);
+                const isRead = (row.READ || '').toUpperCase() === 'TRUE';
+                if (filter === 'read' && !isRead) return false;
+                if (filter === 'unread' && isRead) return false;
+                return textMatch;
             });
 
-            // Sort
+            // Sort logic (same as before)
             filtered.sort((a, b) => {
-                let comparison = 0;
-                if (sortMode === 'title') {
-                    comparison = (a.TITLE || '').localeCompare(b.TITLE || '');
-                } else if (sortMode === 'year') {
-                    const getYear = (str) => {
-                        const match = (str || '').match(/\d{4}/);
-                        return match ? parseInt(match[0]) : 0;
-                    };
-                    comparison = getYear(a.PUBLISH) - getYear(b.PUBLISH); // Old -> New
-                } else if (sortMode === 'rating') {
-                    const rA = a.RATING ? parseFloat(a.RATING) : -1;
-                    const rB = b.RATING ? parseFloat(b.RATING) : -1;
-                    comparison = rA - rB; // Low -> High
-                } else if (sortMode === 'imprint') comparison = (a.IMPRINT || '').localeCompare(b.IMPRINT || '');
-                else if (sortMode === 'character') comparison = (a.CHARACTER || '').localeCompare(b.CHARACTER || '');
-                return isDescending ? -comparison : comparison;
+                let res = 0;
+                if (sortMode === 'title') res = (a.TITLE || '').localeCompare(b.TITLE || '');
+                else if (sortMode === 'year') {
+                    const getYear = s => (s || '').match(/\d{4}/) ? parseInt((s || '').match(/\d{4}/)[0]) : 0;
+                    res = getYear(a.PUBLISH) - getYear(b.PUBLISH);
+                }
+                else if (sortMode === 'rating') res = (parseFloat(a.RATING) || -1) - (parseFloat(b.RATING) || -1);
+                
+                return isDescending ? -res : res;
             });
 
-            document.getElementById('statsBar').innerHTML = `${filtered.length} TITLES FOUND`;
+            document.getElementById('statsBar').innerText = `Objects: ${filtered.length}`;
 
-            // Theme Settings per Publisher (Fallback)
-            const theme = {
-                marvel: { color: 'text-red-400', border: 'group-hover:border-red-500/50', glow: 'group-hover:shadow-red-900/20' },
-                dc: { color: 'text-blue-400', border: 'group-hover:border-blue-500/50', glow: 'group-hover:shadow-blue-900/20' },
-                others: { color: 'text-purple-400', border: 'group-hover:border-purple-500/50', glow: 'group-hover:shadow-purple-900/20' }
-            }[currentTab] || { color: 'text-gray-400', border: 'group-hover:border-gray-500', glow: '' };
+            filtered.forEach(comic => {
+                const isRead = (comic.READ || '').toUpperCase() === 'TRUE';
+                
+                // Code Block Card Style
+                const div = document.createElement('div');
+                div.className = "bg-[#252526] p-0 border-l-[3px] border-[#007acc] hover:border-white transition group relative overflow-hidden";
+                if(currentTab === 'marvel') div.style.borderColor = "#c586c0"; // Purple for JS keywords
+                if(currentTab === 'dc') div.style.borderColor = "#4fc1ff"; // Blue
 
-            // Render
-            filtered.forEach((comic, index) => {
-                const isRead = (comic.READ || '').toString().toUpperCase() === 'TRUE';
-                const isOwned = (comic.OWN || '').toString().toUpperCase() === 'TRUE';
-
-                // Animation Stagger
-                const card = document.createElement('div');
-                card.style.animation = `fadeInUp 0.5s ease backwards ${index * 0.05}s`;
-
-                // Card HTML
-                card.className = `comic-card group relative bg-slate-800 rounded-2xl overflow-hidden shadow-xl border border-slate-700/50 ${theme.border} ${theme.glow}`;
-
-                card.innerHTML = `
-                    <!-- Hero Image Area -->
-                    <div class="relative h-64 overflow-hidden bg-slate-900">
-                        ${comic.IMAGE ?
-                        `<img src="${comic.IMAGE}" alt="${comic.TITLE}" class="w-full h-full object-cover opacity-90 group-hover:opacity-100 group-hover:scale-110 transition-transform duration-700 ease-in-out">` :
-                        `<div class="w-full h-full flex items-center justify-center text-slate-700"><i class="fa-solid fa-book-open text-6xl opacity-20"></i></div>`
+                div.innerHTML = `
+                    <!-- Image as tooltip/preview or small side thumbnail? Let's use standard image but dimmed -->
+                    ${comic.IMAGE ? 
+                        `<div class="h-32 overflow-hidden border-b border-[#3e3e42]">
+                            <img src="${comic.IMAGE}" class="w-full h-full object-cover opacity-80 group-hover:opacity-100 transition">
+                        </div>` : ''
                     }
+                    
+                    <div class="p-3 font-mono text-xs">
+                        <div class="text-[#569cd6] mb-1">class <span class="text-[#4ec9b0]">${(comic.TITLE || '').replace(/\s+/g, '')}</span> {</div>
                         
-                        <!-- Gradient Overlay -->
-                        <div class="absolute inset-0 bg-gradient-to-t from-slate-900 via-slate-900/20 to-transparent"></div>
-
-                        <!-- Top Flags -->
-                        <div class="absolute top-3 right-3 flex gap-2">
-                             <span class="px-2 py-1 bg-black/60 backdrop-blur-md rounded-md text-[10px] uppercase font-bold tracking-wider ${isOwned ? 'text-green-400 border border-green-500/30' : 'text-slate-400 border border-slate-600'}">
-                                ${isOwned ? 'Owned' : 'Digital'}
-                            </span>
+                        <div class="pl-4 border-l border-[#3e3e42] ml-1">
+                            <div><span class="text-[#9cdcfe]">author</span>: <span class="text-[#ce9178]">"${comic.WRITER}"</span>;</div>
+                            <div><span class="text-[#9cdcfe]">year</span>: <span class="text-[#b5cea8]">${(comic.PUBLISH || '').match(/\d{4}/)?.[0] || 'null'}</span>;</div>
+                            <div><span class="text-[#9cdcfe]">read</span>: <span class="text-[#569cd6]">${isRead}</span>;</div>
+                            ${comic.RATING ? `<div><span class="text-[#9cdcfe]">rating</span>: <span class="text-[#b5cea8]">${comic.RATING}</span>;</div>` : ''}
                         </div>
+                        
+                        <div class="text-[#569cd6] mt-1">}</div>
                     </div>
-
-                    <!-- Content Body -->
-                    <div class="relative p-5 -mt-10">
-                        <!-- Imprint / Publisher Tag -->
-                        <div class="flex items-center justify-between mb-2">
-                            <span class="text-[10px] font-black tracking-[0.2em] uppercase ${theme.color} drop-shadow-sm">
-                                ${comic.IMPRINT || 'IMMERSIVE'}
-                            </span>
-                            ${comic.PUBLISH ? `<span class="text-[10px] text-slate-500 font-mono">${comic.PUBLISH}</span>` : ''}
-                        </div>
-
-                        <!-- Title -->
-                        <h3 class="text-xl font-bold text-white leading-tight mb-2 group-hover:text-amber-50 transition-colors line-clamp-2" title="${comic.TITLE}">
-                            ${comic.TITLE}
-                        </h3>
-
-                        <!-- Meta -->
-                        <p class="text-sm text-slate-400 mb-4 line-clamp-1">
-                            by <span class="text-slate-300">${comic.WRITER}</span>
-                        </p>
-
-                        <!-- Footer -->
-                        <div class="flex items-center justify-between pt-4 border-t border-white/5">
-                            <div class="flex items-center gap-2 text-sm">
-                                ${isRead
-                        ? `<i class="fa-solid fa-circle-check text-emerald-500"></i> <span class="text-slate-400">Read</span>`
-                        : `<i class="fa-regular fa-circle text-slate-600"></i> <span class="text-slate-500">Unread</span>`
-                    }
-                            </div>
-                            
-                            <!-- Rating or Link -->
-                            <div class="flex items-center gap-3">
-                                ${comic.RATING ? `<span class="text-amber-400 font-bold text-sm"><i class="fa-solid fa-star text-[10px] align-text-top"></i> ${comic.RATING}</span>` : ''}
-                                
-                                ${comic.LINK ? `
-                                    <a href="${comic.LINK}" target="_blank" class="w-8 h-8 flex items-center justify-center rounded-full bg-slate-700 text-slate-300 hover:bg-blue-600 hover:text-white transition-all transform hover:rotate-12">
-                                        <i class="fa-solid fa-arrow-up-right-from-square text-xs"></i>
-                                    </a>
-                                ` : ''}
-                            </div>
-                        </div>
-                    </div>
+                    
+                    <!-- Hover Action -->
+                    ${comic.LINK ? 
+                    `<a href="${comic.LINK}" target="_blank" class="absolute top-2 right-2 px-2 py-1 bg-[#007acc] text-white text-xs opacity-0 group-hover:opacity-100 transition">
+                        <i class="fa-solid fa-external-link-alt"></i> Open
+                    </a>` : ''}
                 `;
-                grid.appendChild(card);
+                grid.appendChild(div);
             });
         }
-
-        // Add FadeIn Keyframe
-        const style = document.createElement('style');
-        style.innerHTML = `
-            @keyframes fadeInUp {
-                from { opacity: 0; transform: translateY(20px); }
-                to { opacity: 1; transform: translateY(0); }
-            }
-        `;
-        document.head.appendChild(style);
     </script>
 </body>
-
 </html>
