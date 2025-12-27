@@ -1,22 +1,13 @@
-<!DOCTYPE html>
-<html lang="en">
 
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ComicDB - VSCode Mode</title>
-    <!-- Tailwind CSS -->
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.0/papaparse.min.js"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-    
-    <!-- Fonts: Atkinson Hyperlegible Mono (User Request) -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible+Mono:wght@400;700&display=swap" rel="stylesheet">
+import re
 
-    <style>
-                :root {
+# Read the file
+with open('index.html', 'r') as f:
+    content = f.read()
+
+# 1. Update CSS Variables Definition (Add missing ones)
+# We need to ensure we have vars for all the UI elements to allow global theming
+css_vars = """        :root {
             --bg-editor: #1e1e1e;
             --bg-sidebar: #252526;
             --bg-activity: #333333;
@@ -37,208 +28,182 @@
             --number: #b5cea8;       /* Light Green */
             --type: #4ec9b0;         /* Teal */
             --variable: #9cdcfe;     /* Light Blue */
-        }
+        }"""
 
-        body {
-            font-family: 'Atkinson Hyperlegible Mono', monospace;
-            background-color: var(--bg-editor);
-            color: var(--text-main);
-        }
+content = re.sub(r':root \{[^}]+\}', css_vars, content, flags=re.DOTALL)
 
-        /* Splash Screen Typing Cursor */
-        .cursor::after {
-            content: '█';
-            animation: blink 1s step-end infinite;
-        }
-        @keyframes blink { 50% { opacity: 0; } }
+# 2. Add Theme Data for the new variables
+# We need to update the `themes` object in JS to include these new vars
+js_themes = """const themes = {
+            'dark-plus': {
+                '--bg-editor': '#1e1e1e', '--bg-sidebar': '#252526', '--bg-activity': '#333333', 
+                '--bg-panel': '#2d2d2d', '--bg-input': '#3c3c3c', '--bg-item-hover': '#2a2d2e', '--bg-item-active': '#37373d',
+                '--border': '#3e3e42', '--accent': '#007acc', '--text-main': '#d4d4d4', '--text-muted': '#858585',
+                '--keyword': '#569cd6', '--string': '#ce9178', '--function': '#dcdcaa', '--number': '#b5cea8', '--type': '#4ec9b0', '--variable': '#9cdcfe'
+            },
+            'light-plus': {
+                '--bg-editor': '#ffffff', '--bg-sidebar': '#f3f3f3', '--bg-activity': '#2c2c2c', 
+                '--bg-panel': '#f3f3f3', '--bg-input': '#ffffff', '--bg-item-hover': '#e8e8e8', '--bg-item-active': '#007acc33',
+                '--border': '#e4e4e4', '--accent': '#007acc', '--text-main': '#333333', '--text-muted': '#666666',
+                '--keyword': '#0000ff', '--string': '#a31515', '--function': '#795e26', '--number': '#098658', '--type': '#267f99', '--variable': '#001080'
+            },
+            'monokai': {
+                '--bg-editor': '#272822', '--bg-sidebar': '#1e1f1c', '--bg-activity': '#171814', 
+                '--bg-panel': '#1e1f1c', '--bg-input': '#414339', '--bg-item-hover': '#3e3d32', '--bg-item-active': '#75715e',
+                '--border': '#1e1f1c', '--accent': '#f92672', '--text-main': '#f8f8f2', '--text-muted': '#75715e',
+                '--keyword': '#f92672', '--string': '#e6db74', '--function': '#a6e22e', '--number': '#ae81ff', '--type': '#66d9ef', '--variable': '#fd971f'
+            },
+            'abyss': {
+                '--bg-editor': '#000c18', '--bg-sidebar': '#051336', '--bg-activity': '#102a5f', 
+                '--bg-panel': '#0b1c42', '--bg-input': '#223355', '--bg-item-hover': '#112244', '--bg-item-active': '#1e3a6e',
+                '--border': '#2d3664', '--accent': '#77085a', '--text-main': '#6688c2', '--text-muted': '#3b5588',
+                '--keyword': '#225588', '--string': '#22aa44', '--function': '#ddbb88', '--number': '#d2dfee', '--type': '#9966b8', '--variable': '#77085a'
+            },
+            'solarized': {
+                '--bg-editor': '#fdf6e3', '--bg-sidebar': '#eee8d5', '--bg-activity': '#93a1a1', 
+                '--bg-panel': '#e6dfc4', '--bg-input': '#fdf6e3', '--bg-item-hover': '#d5ccb4', '--bg-item-active': '#d3368222',
+                '--border': '#d3cbb7', '--accent': '#2aa198', '--text-main': '#586e75', '--text-muted': '#93a1a1',
+                '--keyword': '#859900', '--string': '#cb4b16', '--function': '#b58900', '--number': '#2aa198', '--type': '#268bd2', '--variable': '#6c71c4'
+            }
+        };"""
 
-        /* Custom Scrollbar */
-        ::-webkit-scrollbar { width: 10px; }
-        ::-webkit-scrollbar-track { background: var(--bg-editor); }
-        ::-webkit-scrollbar-thumb { background: #424242; }
-        ::-webkit-scrollbar-thumb:hover { background: #4f4f4f; }
+content = re.sub(r'const themes = \{.*?\};', js_themes, content, flags=re.DOTALL)
 
-        /* Utilities */
-        .vscode-border { border: 1px solid var(--border); }
-        .vscode-card { background-color: var(--bg-sidebar); }
-        .vscode-input { 
-            background-color: var(--activity); 
-            border: 1px solid var(--border); 
-            color: var(--text-main);
-        }
-        .vscode-input:focus { border-color: var(--accent); outline: none; }
-    </style>
-</head>
 
-<body class="h-screen overflow-hidden flex flex-col">
+# 3. Replace Hardcoded Hexes with CSS Variables in HTML
+replacements = {
+    'bg-[#1e1e1e]': 'bg-[var(--bg-editor)]',
+    'bg-[#252526]': 'bg-[var(--bg-sidebar)]',
+    'bg-[#333333]': 'bg-[var(--bg-activity)]',
+    'bg-[#3c3c3c]': 'bg-[var(--bg-input)]',  # Header + Inputs
+    'bg-[#2d2d2d]': 'bg-[var(--bg-panel)]',
+    'bg-[#37373d]': 'bg-[var(--bg-item-active)]',
+    'hover:bg-[#2a2d2e]': 'hover:bg-[var(--bg-item-hover)]',
+    'border-[#3e3e42]': 'border-[var(--border)]',
+    'border-[#252526]': 'border-[var(--bg-sidebar)]',
+    'border-[#1e1e1e]': 'border-[var(--bg-editor)]',
+    'border-[#454545]': 'border-[var(--border)]',
+    'border-black': 'border-[var(--border)]', # Fix tab header bottom border
+    'border-[#4e4e4e]': 'border-[var(--border)]',
+    'text-[#d4d4d4]': 'text-[var(--text-main)]',
+    'text-[#858585]': 'text-[var(--text-muted)]',
+    'text-gray-400': 'text-[var(--text-muted)]', # Approximate
+    'text-gray-300': 'text-[var(--text-main)]',
+    'bg-[#007acc]': 'bg-[var(--accent)]',
+    'border-[#007acc]': 'border-[var(--accent)]',
+    # Syntax Highlighting Colors
+    'text-[#569cd6]': 'text-[var(--keyword)]',
+    'text-[#4ec9b0]': 'text-[var(--type)]',
+    'text-[#9cdcfe]': 'text-[var(--variable)]',
+    'text-[#ce9178]': 'text-[var(--string)]',
+    'text-[#b5cea8]': 'text-[var(--number)]'
+}
 
-    <!-- SPLASH SCREEN -->
-    <div id="splash" class="fixed inset-0 z-50 bg-[var(--bg-editor)] flex items-center justify-center font-mono text-lg">
-        <div class="w-full max-w-2xl p-10">
-            <div id="terminal-text" class="text-green-500 mb-2"></div>
-            <div class="text-gray-500 text-sm mt-4 hidden" id="splash-footer">Initializing environment... v1.42.0</div>
-        </div>
-    </div>
+for hex_code, var_code in replacements.items():
+    content = content.replace(hex_code, var_code)
 
-    <!-- VSCode Title Bar (Fake) -->
-    <div class="h-8 bg-[var(--bg-input)] flex items-center justify-between px-4 text-xs select-none">
-        <div class="flex gap-4">
-            <span class="font-bold">ComicDB.code-workspace</span>
-            <span class="text-[var(--text-muted)]">File</span>
-            <span class="text-[var(--text-muted)]">Edit</span>
-            <span class="text-[var(--text-muted)]">Selection</span>
-            <span class="text-[var(--text-muted)]">View</span>
-        </div>
-        
-        <!-- Command Palette / Search (Centered) -->
-        <div class="flex-1 max-w-xl mx-4 relative">
-             <div class="bg-[var(--bg-panel)] rounded-md border border-[var(--border)] flex items-center px-2 py-0.5 w-full">
-                <i class="fa-solid fa-search text-[var(--text-muted)] text-xs mr-2"></i>
-                <input type="text" id="searchInput" placeholder="Search (Cmd+F)"
-                    class="bg-transparent border-none text-[var(--text-main)] text-xs w-full focus:outline-none placeholder-gray-500">
-             </div>
-        </div>
+# 4. Update JS Logic (Shortcuts, Sidebar Actions, Sort Arrow)
+js_logic = """
+        document.addEventListener('keydown', (e) => {
+            // CMD+F / CTRL+F -> Focus Search
+            if ((e.metaKey || e.ctrlKey) && e.key === 'f') {
+                e.preventDefault();
+                document.getElementById('searchInput').focus();
+            }
+            // CMD+B / CTRL+B -> Toggle Sidebar (VSCode standard)
+            if ((e.metaKey || e.ctrlKey) && e.key === 'b') {
+                e.preventDefault();
+                document.getElementById('icon-files').click();
+            }
+        });
 
-        <div class="flex gap-3 text-[var(--text-muted)]">
-             <i class="fa-solid fa-window-minimize hover:text-white"></i>
-             <i class="fa-regular fa-square hover:text-white"></i>
-             <i class="fa-solid fa-xmark hover:text-white"></i>
-        </div>
-    </div>
+        document.addEventListener('DOMContentLoaded', () => {
+            runSplash();
+            loadSheet('marvel');
 
-    <!-- Main Layout -->
-    <div class="flex flex-1 overflow-hidden">
-        
-        <!-- Activity Bar (Left Sidebar) -->
-        <div class="w-12 bg-[var(--bg-activity)] flex flex-col items-center py-4 gap-6 text-[var(--text-muted)] text-xl border-r border-[var(--bg-sidebar)]">
-            <i id="icon-files" class="fa-solid fa-files text-white border-l-2 border-white pl-3 pr-4 py-1 activity-icon cursor-pointer"></i> <!-- Explorer -->
-            <i id="icon-search" class="fa-solid fa-search hover:text-white transition cursor-pointer activity-icon"></i>
-            <i id="icon-git" class="fa-solid fa-code-branch hover:text-white transition cursor-pointer activity-icon"></i>
-            <i id="icon-debug" class="fa-solid fa-bug hover:text-white transition cursor-pointer activity-icon"></i>
-            <div class="flex-1"></div>
-            <i id="icon-settings" class="fa-solid fa-gear hover:text-white transition cursor-pointer mb-2 activity-icon"></i>
-        </div>
-
-        <!-- Sidebar (File Explorer) -->
-        <div id="sidebar-panel" class="w-64 bg-[var(--bg-sidebar)] flex flex-col text-sm border-r border-[var(--bg-editor)] hidden md:flex">
-            <div class="px-4 py-2 uppercase text-xs font-bold text-[var(--text-muted)] tracking-wider">Explorer</div>
+            // --- FUNCTIONAL SIDEBAR ---
+            const sidebarExplorer = document.getElementById('sidebar-panel');
             
-            <!-- Open Editors -->
-            <div class="px-4 py-1 flex items-center gap-1 bg-[var(--bg-item-active)] text-white">
-                <i class="fa-solid fa-chevron-down text-[10px]"></i> 
-                <span class="font-bold">OPEN COMICS</span>
-            </div>
+            // Files Icon -> Toggle Explorer
+            document.getElementById('icon-files').addEventListener('click', (e) => {
+                const isActive = !sidebarExplorer.classList.contains('hidden');
+                
+                if (isActive) {
+                    sidebarExplorer.classList.add('hidden');
+                    document.getElementById('icon-files').classList.remove('text-white', 'border-l-2', 'border-white');
+                } else {
+                    sidebarExplorer.classList.remove('hidden');
+                    document.querySelectorAll('.activity-icon').forEach(i => i.classList.remove('text-white', 'border-l-2', 'border-white'));
+                    document.getElementById('icon-files').classList.add('text-white', 'border-l-2', 'border-white');
+                }
+            });
+
+            // Search Icon -> Focus Search
+            document.getElementById('icon-search').addEventListener('click', () => {
+                 document.getElementById('searchInput').focus();
+                 document.querySelectorAll('.activity-icon').forEach(i => i.classList.remove('text-white', 'border-l-2', 'border-white'));
+                 document.getElementById('icon-search').classList.add('text-white', 'border-l-2', 'border-white');
+            });
             
-            <!-- Folder Structure (Tabs) -->
-            <div class="mt-2 pl-2">
-                <div onclick="loadSheet('marvel')" id="btn-marvel" class="cursor-pointer px-2 py-1 flex items-center gap-2 hover:bg-[var(--bg-item-hover)] text-[var(--text-main)]">
-                    <i class="fa-brands fa-js text-[#f1e05a]"></i> <!-- JS Icon for marvel -->
-                    <span>marvel_comics.js</span>
-                    <span id="badge-marvel" class="ml-auto text-[10px] bg-[var(--accent)] text-white px-1.5 rounded-full hidden">A</span>
-                </div>
-                <div onclick="loadSheet('dc')" id="btn-dc" class="cursor-pointer px-2 py-1 flex items-center gap-2 hover:bg-[var(--bg-item-hover)] text-[var(--text-main)]">
-                    <i class="fa-brands fa-js text-[#f1e05a]"></i>
-                    <span>dc_universe.js</span>
-                </div>
-                <div onclick="loadSheet('others')" id="btn-others" class="cursor-pointer px-2 py-1 flex items-center gap-2 hover:bg-[var(--bg-item-hover)] text-[var(--text-main)]">
-                    <i class="fa-solid fa-file-code text-blue-400"></i>
-                    <span>indie_reads.json</span>
-                </div>
-            </div>
+            // Git Icon
+            document.getElementById('icon-git').addEventListener('click', () => {
+                alert("Source Control: No providers registered. (It's a static site!)");
+            });
 
-            <div class="mt-6 px-4 py-2 uppercase text-xs font-bold text-[var(--text-muted)] tracking-wider">Properties</div>
-             <!-- Filters in Sidebar -->
-             <div class="px-4 py-2 gap-3 flex flex-col">
-                 <select id="readFilter" class="bg-[var(--bg-input)] text-[var(--text-main)] text-xs p-1 border border-[var(--border)] outline-none">
-                     <option value="all">filter: all</option>
-                     <option value="read">filter: read</option>
-                     <option value="unread">filter: unread</option>
-                 </select>
-                 
-                 <select id="sortSelect" class="bg-[var(--bg-input)] text-[var(--text-main)] text-xs p-1 border border-[var(--border)] outline-none">
-                     <option value="title">sort: title.asc</option>
-                     <option value="year">sort: year.desc</option>
-                     <option value="rating">sort: rating.desc</option>
-                 </select>
-                 
-                 <button id="orderBtn" class="text-left text-xs text-[var(--keyword)] hover:underline">
-                     <i class="fa-solid fa-arrow-down-a-z"></i> toggle: direction
-                 </button>
-             </div>
-        </div>
+            // Debug Icon
+            document.getElementById('icon-debug').addEventListener('click', () => {
+                const debugInfo = {
+                    currentTab,
+                    totalItems: currentData.length,
+                    activeTheme: document.getElementById('themeSelect').value
+                };
+                alert('DEBUG CONTEXT:\\n' + JSON.stringify(debugInfo, null, 2));
+            });
 
-        <!-- Editor Area (Grid) -->
-        <div class="flex-1 flex flex-col bg-[var(--bg-editor)] overflow-hidden">
-            <!-- Tabs Header -->
-            <div class="h-9 bg-[var(--bg-panel)] flex items-center overflow-x-auto text-sm border-b border-[var(--border)]">
-                <div id="tab-label" class="bg-[var(--bg-editor)] text-[var(--text-main)] px-4 h-full flex items-center border-t-2 border-[var(--accent)] gap-2 pr-8 relative">
-                    <i class="fa-brands fa-js text-yellow-500"></i>
-                    <span>main.js</span>
-                    <i class="fa-solid fa-xmark text-gray-500 hover:text-white absolute right-2 text-xs"></i>
-                </div>
-                <!-- Fake inactive tab -->
-                <div class="bg-[var(--bg-panel)] text-gray-500 px-4 h-full flex items-center gap-2 border-r border-[var(--bg-sidebar)]">
-                    <i class="fa-solid fa-file-lines"></i>
-                    <span>README.md</span>
-                </div>
-            </div>
+            // Settings Icon -> Toggle Modal
+            document.getElementById('icon-settings').addEventListener('click', (e) => {
+                e.stopPropagation();
+                document.getElementById('settings-modal').classList.toggle('hidden');
+            });
+            
+            // ... (Rest of listeners)
+"""
 
-            <!-- Breadcrumbs -->
-            <div class="h-6 flex items-center px-4 text-xs text-gray-500 gap-1 bg-[var(--bg-editor)]">
-                <span>src</span> <i class="fa-solid fa-chevron-right text-[10px]"></i>
-                <span>components</span> <i class="fa-solid fa-chevron-right text-[10px]"></i>
-                <span id="crumb-active" class="text-white">marvel_comics.js</span>
-                <span id="statsBar" class="ml-auto text-xs text-gray-500">Loading...</span>
-            </div>
+# Replace the specific DOMContentLoaded block
+# We need to target the block carefully. 
+# Identifying start of DOMListener till theme selectListener
+start_marker = "document.addEventListener('DOMContentLoaded', () => {"
+end_marker = "document.getElementById('themeSelect').addEventListener('change', (e) => {"
 
-            <!-- Grid Content -->
-            <div class="flex-1 overflow-y-auto p-4 md:p-6" id="scroll-container">
-                <div id="loading" class="hidden text-center py-10">
-                    <div class="text-[var(--keyword)]">Loading modules...</div>
-                </div>
+# We will reconstruct the cleaner JS block
+# It's safer to just inject the new IDs into HTML and then rewrite the whole script block
+# First, let's update HTML IDs for Git/Debug
+content = content.replace('class="fa-solid fa-code-branch', 'id="icon-git" class="fa-solid fa-code-branch')
+content = content.replace('class="fa-solid fa-bug', 'id="icon-debug" class="fa-solid fa-bug')
 
-                <div id="comicGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-4">
-                    <!-- Cards -->
-                </div>
-            </div>
-        </div>
-    </div>
+# Change Search Placeholder
+content = content.replace('placeholder="Search files (Ctrl+P)"', 'placeholder="Search (Cmd+F)"')
 
-    <!-- Status Bar -->
-    <div class="h-6 bg-[var(--accent)] flex items-center justify-between px-3 text-[11px] text-white">
-        <div class="flex gap-4">
-            <span><i id="icon-git" class="fa-solid fa-code-branch text-[10px]"></i> main*</span>
-            <span><i class="fa-regular fa-circle-xmark"></i> 0</span>
-            <span><i class="fa-solid fa-triangle-exclamation"></i> 0</span>
-        </div>
-        <div class="flex gap-4">
-            <span>Ln 12, Col 42</span>
-            <span>UTF-8</span>
-            <span>JavaScript</span>
-            <span><i class="fa-regular fa-bell"></i></span>
-        </div>
-    </div>
 
-    <!-- Settings Modal -->
-    <div id="settings-modal" class="hidden absolute bottom-12 left-12 w-64 bg-[var(--bg-sidebar)] border border-[var(--border)] shadow-2xl z-50 text-sm">
-        <div class="p-2 text-xs text-gray-500 font-bold uppercase tracking-wider border-b border-[var(--border)]">Preferences</div>
-        <div class="p-2">
-            <div class="mb-2 text-[var(--text-main)]">Color Theme</div>
-            <select id="themeSelect" class="w-full bg-[var(--bg-input)] text-white p-1 border border-[var(--border)] outline-none hover:border-[var(--accent)]">
-                <option value="dark-plus">Dark+ (Default)</option>
-                <option value="light-plus">Light+ (Standard)</option>
-                <option value="monokai">Monokai</option>
-                <option value="abyss">Abyss</option>
-                <option value="solarized">Solarized Light</option>
-            </select>
-        </div>
-        <div class="border-t border-[var(--border)] p-2 hover:bg-[var(--bg-item-hover)] cursor-pointer text-[var(--text-main)] flex items-center justify-between group">
-            <span>Keyboard Shortcuts</span>
-            <span class="text-xs text-gray-500 group-hover:text-white">⌘K ⌘S</span>
-        </div>
-    </div>
+# Sort Arrow Logic
+# Find the renderComics function and update the arrow icon
+sort_arrow_logic = """
+            // Update Sort Arrow
+            const orderBtn = document.getElementById('orderBtn');
+            orderBtn.innerHTML = isDescending 
+                ? `<i class="fa-solid fa-arrow-down-z-a"></i> toggle: desc` 
+                : `<i class="fa-solid fa-arrow-down-a-z"></i> toggle: asc`;
+"""
+# Insert this before grid.appendChild in renderComics
+content = content.replace('grid.appendChild(div);', sort_arrow_logic + '\n                grid.appendChild(div);', 1) 
+# Wait, this would run for EVERY card. Bad ID.
+# Better to put it outside the loop.
+# Let's replace the listener for 'orderBtn' and the update logic.
 
-    <script>
+# Revised JS injection strategy: Use the fact that we know the file structure from previous 'view_file'
+# I will fully rewrite the <script> tag to be safe.
+
+full_script = """    <script>
         // --- DATA CONFIG ---
         const sheetConfig = {
             marvel: "https://docs.google.com/spreadsheets/d/e/2PACX-1vTFTPLKwr0aJgqiW3fPIbp5SvHLSDu6mPGnILzw9uMBKWfw7VdNykUY4NLiGNcb4dU3VI7XLkO8iSqX/pub?gid=61223904&single=true&output=csv",
@@ -368,13 +333,11 @@
             // Search Icon -> Focus Search
             document.getElementById('icon-search').addEventListener('click', () => {
                  document.getElementById('searchInput').focus();
-                 document.querySelectorAll('.activity-icon').forEach(i => i.classList.remove('text-white', 'border-l-2', 'border-white'));
-                 document.getElementById('icon-search').classList.add('text-white', 'border-l-2', 'border-white');
             });
             
             // Git Icon
             document.getElementById('icon-git').addEventListener('click', () => {
-                alert("Source Control: No providers registered. (It's a static site!)");
+                alert("Source Control: No providers registered.");
             });
 
             // Debug Icon
@@ -480,7 +443,7 @@
                 let res = 0;
                 if (sortMode === 'title') res = (a.TITLE || '').localeCompare(b.TITLE || '');
                 else if (sortMode === 'year') {
-                    const getYear = s => (s || '').match(/\\d{4}/) ? parseInt((s || '').match(/\\d{4}/)[0]) : 0;
+                    const getYear = s => (s || '').match(/\d{4}/) ? parseInt((s || '').match(/\d{4}/)[0]) : 0;
                     res = getYear(a.PUBLISH) - getYear(b.PUBLISH);
                 }
                 else if (sortMode === 'rating') res = (parseFloat(a.RATING) || -1) - (parseFloat(b.RATING) || -1);
@@ -509,26 +472,25 @@
                     }
                     
                     <div class="p-3 font-mono text-xs">
-                        <div style="color: var(--keyword)" class="mb-1">class <span style="color: var(--type)">${(comic.TITLE || '').replace(/\\s+/g, '')}</span> {</div>
+                        <div style="color: var(--keyword)" class="mb-1">class <span style="color: var(--type)">${(comic.TITLE || '').replace(/\s+/g, '')}</span> {</div>
                         
                         <div class="pl-4 ml-1" style="border-left: 1px solid var(--border)">
                             <div><span style="color: var(--variable)">author</span>: <span style="color: var(--string)">"${comic.WRITER}"</span>;</div>
-                            <div><span style="color: var(--variable)">year</span>: <span style="color: var(--number)">${(comic.PUBLISH || '').match(/\\d{4}/)?.[0] || 'null'}</span>;</div>
+                            <div><span style="color: var(--variable)">year</span>: <span style="color: var(--number)">${(comic.PUBLISH || '').match(/\d{4}/)?.[0] || 'null'}</span>;</div>
                             <div><span style="color: var(--variable)">read</span>: <span style="color: var(--keyword)">${isRead}</span>;</div>
                             ${comic.RATING ? `<div><span style="color: var(--variable)">rating</span>: <span style="color: var(--number)">${comic.RATING}</span>;</div>` : ''}
                         </div>
                         
                         <div style="color: var(--keyword)" class="mt-1">}</div>
                     </div>
-                    
-                    <!-- Hover Action -->
-                    ${comic.LINK ? 
-                    `<a href="${comic.LINK}" target="_blank" class="absolute top-2 right-2 px-2 py-1 bg-[#007acc] text-white text-xs opacity-0 group-hover:opacity-100 transition" style="background-color: var(--accent)">
-                        <i class="fa-solid fa-external-link-alt"></i>
-                    </a>` : ''}
                 `;
                 grid.appendChild(div);
             });
         }
-    </script></body>
-</html>
+    </script>"""
+
+# Using regex to replace the old script block with the new one
+content = re.sub(r'<script>\s*// --- DATA CONFIG ---.*?</script>', full_script, content, flags=re.DOTALL)
+
+with open('index.html', 'w') as f:
+    f.write(content)
