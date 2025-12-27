@@ -616,7 +616,7 @@
                 let res = 0;
                 if (sortMode === 'title') res = (a.TITLE || '').localeCompare(b.TITLE || '');
                 else if (sortMode === 'year') {
-                    const getYear = s => (s || '').match(/\\d{4}/) ? parseInt((s || '').match(/\\d{4}/)[0]) : 0;
+                    const getYear = s => (s || '').match(/\d{4}/) ? parseInt((s || '').match(/\d{4}/)[0]) : 0;
                     res = getYear(a.PUBLISH) - getYear(b.PUBLISH);
                 }
                 else if (sortMode === 'rating') res = (parseFloat(a.RATING) || -1) - (parseFloat(b.RATING) || -1);
