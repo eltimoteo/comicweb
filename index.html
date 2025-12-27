@@ -170,8 +170,8 @@
             <div
                 class="px-4 py-2 flex items-center justify-between uppercase text-xs font-bold text-[var(--text-muted)] tracking-wider">
                 <span>Explorer</span>
-                <i id="btn-collapse-explorer" class="fa-solid fa-ellipsis hover:text-white cursor-pointer"
-                    title="More Actions"></i>
+                <i id="btn-collapse-explorer" class="fa-solid fa-angles-left hover:text-white cursor-pointer"
+                    title="Collapse Explorer"></i>
             </div>
 
             <!-- Open Editors -->
@@ -457,6 +457,12 @@
                     sidebarExplorer.classList.remove('hidden');
                     document.getElementById('icon-files').classList.add('text-[var(--text-active)]', 'border-l-2', 'border-[var(--text-active)]');
                 }
+            });
+
+            // Collapse from Explorer Header
+            document.getElementById('btn-collapse-explorer').addEventListener('click', () => {
+                sidebarExplorer.classList.add('hidden');
+                document.querySelectorAll('.activity-icon').forEach(i => i.classList.remove('text-[var(--text-active)]', 'border-l-2', 'border-[var(--text-active)]'));
             });
 
             // Search Icon -> Focus Search
