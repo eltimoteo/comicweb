@@ -68,6 +68,13 @@
                 <option value="read">Read Only</option>
                 <option value="unread">Unread</option>
             </select>
+            <select id="sortSelect" class="p-3 rounded bg-gray-700 border border-gray-600 text-white">
+                <option value="title">Sort by Title (A-Z)</option>
+                <option value="year">Sort by Year (Newest)</option>
+                <option value="rating">Sort by Rating (High)</option>
+                <option value="imprint">Sort by Imprint</option>
+                <option value="character">Sort by Character</option>
+            </select>
         </div>
 
         <!-- Stats Bar -->
@@ -110,6 +117,7 @@
             // Search Listener
             document.getElementById('searchInput').addEventListener('input', renderComics);
             document.getElementById('readFilter').addEventListener('change', renderComics);
+            document.getElementById('sortSelect').addEventListener('change', renderComics);
         });
 
         function loadSheet(key) {
@@ -147,6 +155,7 @@
             const grid = document.getElementById('comicGrid');
             const search = document.getElementById('searchInput').value.toLowerCase();
             const filter = document.getElementById('readFilter').value;
+            const sortMode = document.getElementById('sortSelect').value;
 
             grid.innerHTML = '';
 
@@ -167,6 +176,37 @@
                 if (filter === 'unread') readMatch = !isRead;
 
                 return textMatch && readMatch;
+            });
+
+            // Sorting Logic
+            filtered.sort((a, b) => {
+                const valA = (a[sortMode.toUpperCase()] || '').toString(); // Fallback for TITLE match if sorting by field
+
+                if (sortMode === 'title') {
+                    return (a.TITLE || '').localeCompare(b.TITLE || '');
+                }
+                if (sortMode === 'year') {
+                    // Try to parse year from PUBLISH date string (e.g. "2024", "Oct 2024", "2024-01")
+                    // Simple heuristic: extract first 4 digit number
+                    const getYear = (str) => {
+                        const match = (str || '').match(/\d{4}/);
+                        return match ? parseInt(match[0]) : 0;
+                    };
+                    return getYear(b.PUBLISH) - getYear(a.PUBLISH); // Descending
+                }
+                if (sortMode === 'rating') {
+                    // Treat empty rating as -1 so it goes to bottom
+                    const rA = a.RATING ? parseFloat(a.RATING) : -1;
+                    const rB = b.RATING ? parseFloat(b.RATING) : -1;
+                    return rB - rA; // Descending
+                }
+                if (sortMode === 'imprint') {
+                    return (a.IMPRINT || '').localeCompare(b.IMPRINT || '');
+                }
+                if (sortMode === 'character') {
+                    return (a.CHARACTER || '').localeCompare(b.CHARACTER || '');
+                }
+                return 0;
             });
 
             // Update Stats
