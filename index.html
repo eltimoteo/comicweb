@@ -86,17 +86,16 @@
     <script>
         // --- CONFIGURATION: PASTE YOUR SHEET IDs HERE ---
         const sheetConfig = {
-            // VERIFICATION REQUIRED:
-            // 1. "Publish to Web" -> "Entire Document" -> "Comma-separated values (.csv)"
-            // 2. Paste the generated link below as 'baseUrl'.
-            baseUrl: "https://docs.google.com/spreadsheets/d/e/2PACX-1vTFTPLKwr0aJgqiW3fPIbp5SvHLSDu6mPGnILzw9uMBKWfw7VdNykUY4NLiGNcb4dU3VI7XLkO8iSqX/pub?output=csv",
+            // OPTION A: BEST RELIABILITY
+            // Go to File > Share > Publish to web.
+            // Select "Marvel" instead of "Entire Document". Select "CSV". Copy Link.
+            marvel: "https://docs.google.com/spreadsheets/d/e/2PACX-1vTFTPLKwr0aJgqiW3fPIbp5SvHLSDu6mPGnILzw9uMBKWfw7VdNykUY4NLiGNcb4dU3VI7XLkO8iSqX/pub?gid=61223904&single=true&output=csv",
 
-            // 3. Enter the GID for each tab (found in the browser URL as &gid=...)
-            tabs: {
-                marvel: "61223904",
-                dc: "0",
-                others: "1684289763"
-            }
+            // Go to "DC", Publish -> "DC" -> CSV. Copy Link.
+            dc: "https://docs.google.com/spreadsheets/d/e/2PACX-1vTFTPLKwr0aJgqiW3fPIbp5SvHLSDu6mPGnILzw9uMBKWfw7VdNykUY4NLiGNcb4dU3VI7XLkO8iSqX/pub?gid=0&single=true&output=csv",
+
+            // Go to "Others", Publish -> "Others" -> CSV. Copy Link.
+            others: "https://docs.google.com/spreadsheets/d/e/2PACX-1vTFTPLKwr0aJgqiW3fPIbp5SvHLSDu6mPGnILzw9uMBKWfw7VdNykUY4NLiGNcb4dU3VI7XLkO8iSqX/pub?gid=1684289763&single=true&output=csv"
         };
         // ------------------------------------------------
 
@@ -124,16 +123,7 @@
             grid.innerHTML = '';
             loader.classList.remove('hidden');
 
-            const baseUrl = sheetConfig.baseUrl;
-            const gid = sheetConfig.tabs[key];
-
-            // Clean the base URL to ensure we append params correctly
-            // Remove any existing query params to rebuild them clean
-            const cleanBase = baseUrl.split('?')[0];
-
-            // Construct new URL with specific GID
-            // Format: .../pub?gid={gid}&single=true&output=csv
-            const csvUrl = `${cleanBase}?gid=${gid}&single=true&output=csv`;
+            const csvUrl = sheetConfig[key];
 
             console.log(`Loading ${key} from: ${csvUrl}`); // Debug log
 
