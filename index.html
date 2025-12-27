@@ -69,10 +69,13 @@
                 <option value="unread">Unread</option>
             </select>
 
-            <button id="sortBtn"
-                class="px-4 py-2 rounded bg-gray-700 border border-gray-600 text-white hover:bg-gray-600 transition">
-                <i class="fa-solid fa-sort"></i> Sort: Title
-            </button>
+            <select id="sortSelect" class="p-3 rounded bg-gray-700 border border-gray-600 text-white">
+                <option value="title">Sort by Title (A-Z)</option>
+                <option value="year">Sort by Year (Newest)</option>
+                <option value="rating">Sort by Rating (High)</option>
+                <option value="imprint">Sort by Imprint</option>
+                <option value="character">Sort by Character</option>
+            </select>
             <button id="orderBtn"
                 class="px-3 py-2 rounded bg-gray-700 border border-gray-600 text-white hover:bg-gray-600 transition"
                 title="Toggle Order">
@@ -114,8 +117,7 @@
         let currentTab = 'marvel';
 
         // Sorting State
-        const sortModes = ['title', 'year', 'rating', 'imprint', 'character'];
-        let currentSortIndex = 0;
+
         let isDescending = false; // false = A-Z/Low-High, true = Z-A/High-Low (Depends on logic)
 
         // Initialize
@@ -127,9 +129,7 @@
             document.getElementById('readFilter').addEventListener('change', renderComics);
 
             // Sort Listeners
-            document.getElementById('sortBtn').addEventListener('click', () => {
-                currentSortIndex = (currentSortIndex + 1) % sortModes.length;
-                updateSortUI();
+            document.getElementById('sortSelect').addEventListener('change', () => {
                 renderComics();
             });
 
@@ -138,25 +138,13 @@
                 updateSortUI();
                 renderComics();
             });
-
-            updateSortUI(); // Initial text
+            
+            updateSortUI(); // Initial icon
         });
 
         function updateSortUI() {
-            const mode = sortModes[currentSortIndex];
-            const btn = document.getElementById('sortBtn');
             const orderBtn = document.getElementById('orderBtn');
-
-            // Update Label
-            const labels = {
-                title: 'Title',
-                year: 'Year',
-                rating: 'Rating',
-                imprint: 'Imprint',
-                character: 'Character'
-            };
-            btn.innerHTML = `<i class="fa-solid fa-sort"></i> Sort: ${labels[mode]}`;
-
+            
             // Update Icon
             if (isDescending) {
                 orderBtn.innerHTML = `<i class="fa-solid fa-arrow-down-z-a"></i>`; // Descending
@@ -200,7 +188,7 @@
             const grid = document.getElementById('comicGrid');
             const search = document.getElementById('searchInput').value.toLowerCase();
             const filter = document.getElementById('readFilter').value;
-            const sortMode = sortModes[currentSortIndex];
+            const sortMode = document.getElementById('sortSelect').value;
 
             grid.innerHTML = '';
 
