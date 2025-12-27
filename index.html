@@ -9,11 +9,12 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.0/papaparse.min.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-    
+
     <!-- Fonts: Atkinson Hyperlegible Mono (User Request) -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible+Mono:wght@400;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible+Mono:wght@400;700&display=swap"
+        rel="stylesheet">
 
     <style>
         :root {
@@ -23,11 +24,16 @@
             --border: #3e3e42;
             --accent: #007acc;
             --text-main: #d4d4d4;
-            --keyword: #569cd6;      /* Blue */
-            --string: #ce9178;       /* Orange/Brown */
-            --function: #dcdcaa;     /* Yellow */
-            --comment: #6a9955;      /* Green */
-            --number: #b5cea8;       /* Light Green */
+            --keyword: #569cd6;
+            /* Blue */
+            --string: #ce9178;
+            /* Orange/Brown */
+            --function: #dcdcaa;
+            /* Yellow */
+            --comment: #6a9955;
+            /* Green */
+            --number: #b5cea8;
+            /* Light Green */
         }
 
         body {
@@ -41,23 +47,49 @@
             content: '█';
             animation: blink 1s step-end infinite;
         }
-        @keyframes blink { 50% { opacity: 0; } }
+
+        @keyframes blink {
+            50% {
+                opacity: 0;
+            }
+        }
 
         /* Custom Scrollbar */
-        ::-webkit-scrollbar { width: 10px; }
-        ::-webkit-scrollbar-track { background: var(--bg-editor); }
-        ::-webkit-scrollbar-thumb { background: #424242; }
-        ::-webkit-scrollbar-thumb:hover { background: #4f4f4f; }
+        ::-webkit-scrollbar {
+            width: 10px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: var(--bg-editor);
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #424242;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: #4f4f4f;
+        }
 
         /* Utilities */
-        .vscode-border { border: 1px solid var(--border); }
-        .vscode-card { background-color: var(--bg-sidebar); }
-        .vscode-input { 
-            background-color: var(--activity); 
-            border: 1px solid var(--border); 
+        .vscode-border {
+            border: 1px solid var(--border);
+        }
+
+        .vscode-card {
+            background-color: var(--bg-sidebar);
+        }
+
+        .vscode-input {
+            background-color: var(--activity);
+            border: 1px solid var(--border);
             color: var(--text-main);
         }
-        .vscode-input:focus { border-color: var(--accent); outline: none; }
+
+        .vscode-input:focus {
+            border-color: var(--accent);
+            outline: none;
+        }
     </style>
 </head>
 
@@ -80,89 +112,101 @@
             <span class="text-gray-400">Selection</span>
             <span class="text-gray-400">View</span>
         </div>
-        
+
         <!-- Command Palette / Search (Centered) -->
         <div class="flex-1 max-w-xl mx-4 relative">
-             <div class="bg-[#2d2d2d] rounded-md border border-[#4e4e4e] flex items-center px-2 py-0.5 w-full">
+            <div class="bg-[#2d2d2d] rounded-md border border-[#4e4e4e] flex items-center px-2 py-0.5 w-full">
                 <i class="fa-solid fa-search text-gray-400 text-xs mr-2"></i>
                 <input type="text" id="searchInput" placeholder="Search files (Ctrl+P)"
                     class="bg-transparent border-none text-gray-300 text-xs w-full focus:outline-none placeholder-gray-500">
-             </div>
+            </div>
         </div>
 
         <div class="flex gap-3 text-gray-400">
-             <i class="fa-solid fa-window-minimize hover:text-white"></i>
-             <i class="fa-regular fa-square hover:text-white"></i>
-             <i class="fa-solid fa-xmark hover:text-white"></i>
+            <i class="fa-solid fa-window-minimize hover:text-white"></i>
+            <i class="fa-regular fa-square hover:text-white"></i>
+            <i class="fa-solid fa-xmark hover:text-white"></i>
         </div>
     </div>
 
     <!-- Main Layout -->
     <div class="flex flex-1 overflow-hidden">
-        
+
         <!-- Activity Bar (Left Sidebar) -->
-        <div class="w-12 bg-[#333333] flex flex-col items-center py-4 gap-6 text-[#858585] text-xl border-r border-[#252526]">
-            <i class="fa-solid fa-files text-white border-l-2 border-white pl-3 pr-4 py-1"></i> <!-- Explorer -->
-            <i class="fa-solid fa-search hover:text-white transition cursor-pointer"></i>
-            <i class="fa-solid fa-code-branch hover:text-white transition cursor-pointer"></i>
-            <i class="fa-solid fa-bug hover:text-white transition cursor-pointer"></i>
+        <div
+            class="w-12 bg-[#333333] flex flex-col items-center py-4 gap-6 text-[#858585] text-xl border-r border-[#252526]">
+            <i id="icon-files"
+                class="fa-solid fa-files text-white border-l-2 border-white pl-3 pr-4 py-1 activity-icon cursor-pointer"></i>
+            <!-- Explorer -->
+            <i id="icon-search" class="fa-solid fa-search hover:text-white transition cursor-pointer activity-icon"></i>
+            <i class="fa-solid fa-code-branch hover:text-white transition cursor-pointer activity-icon"></i>
+            <i class="fa-solid fa-bug hover:text-white transition cursor-pointer activity-icon"></i>
             <div class="flex-1"></div>
-            <i class="fa-solid fa-gear hover:text-white transition cursor-pointer mb-2"></i>
+            <i id="icon-settings"
+                class="fa-solid fa-gear hover:text-white transition cursor-pointer mb-2 activity-icon"></i>
         </div>
 
         <!-- Sidebar (File Explorer) -->
-        <div class="w-64 bg-[#252526] flex flex-col text-sm border-r border-[#1e1e1e] hidden md:flex">
+        <div id="sidebar-panel"
+            class="w-64 bg-[#252526] flex flex-col text-sm border-r border-[#1e1e1e] hidden md:flex">
             <div class="px-4 py-2 uppercase text-xs font-bold text-gray-400 tracking-wider">Explorer</div>
-            
+
             <!-- Open Editors -->
             <div class="px-4 py-1 flex items-center gap-1 bg-[#37373d] text-white">
-                <i class="fa-solid fa-chevron-down text-[10px]"></i> 
+                <i class="fa-solid fa-chevron-down text-[10px]"></i>
                 <span class="font-bold">OPEN COMICS</span>
             </div>
-            
+
             <!-- Folder Structure (Tabs) -->
             <div class="mt-2 pl-2">
-                <div onclick="loadSheet('marvel')" id="btn-marvel" class="cursor-pointer px-2 py-1 flex items-center gap-2 hover:bg-[#2a2d2e] text-[#d4d4d4]">
+                <div onclick="loadSheet('marvel')" id="btn-marvel"
+                    class="cursor-pointer px-2 py-1 flex items-center gap-2 hover:bg-[#2a2d2e] text-[#d4d4d4]">
                     <i class="fa-brands fa-js text-[#f1e05a]"></i> <!-- JS Icon for marvel -->
                     <span>marvel_comics.js</span>
-                    <span id="badge-marvel" class="ml-auto text-[10px] bg-[#007acc] text-white px-1.5 rounded-full hidden">A</span>
+                    <span id="badge-marvel"
+                        class="ml-auto text-[10px] bg-[#007acc] text-white px-1.5 rounded-full hidden">A</span>
                 </div>
-                <div onclick="loadSheet('dc')" id="btn-dc" class="cursor-pointer px-2 py-1 flex items-center gap-2 hover:bg-[#2a2d2e] text-[#d4d4d4]">
+                <div onclick="loadSheet('dc')" id="btn-dc"
+                    class="cursor-pointer px-2 py-1 flex items-center gap-2 hover:bg-[#2a2d2e] text-[#d4d4d4]">
                     <i class="fa-brands fa-js text-[#f1e05a]"></i>
                     <span>dc_universe.js</span>
                 </div>
-                <div onclick="loadSheet('others')" id="btn-others" class="cursor-pointer px-2 py-1 flex items-center gap-2 hover:bg-[#2a2d2e] text-[#d4d4d4]">
+                <div onclick="loadSheet('others')" id="btn-others"
+                    class="cursor-pointer px-2 py-1 flex items-center gap-2 hover:bg-[#2a2d2e] text-[#d4d4d4]">
                     <i class="fa-solid fa-file-code text-blue-400"></i>
                     <span>indie_reads.json</span>
                 </div>
             </div>
 
             <div class="mt-6 px-4 py-2 uppercase text-xs font-bold text-gray-400 tracking-wider">Properties</div>
-             <!-- Filters in Sidebar -->
-             <div class="px-4 py-2 gap-3 flex flex-col">
-                 <select id="readFilter" class="bg-[#3c3c3c] text-gray-300 text-xs p-1 border border-[#3e3e42] outline-none">
-                     <option value="all">filter: all</option>
-                     <option value="read">filter: read</option>
-                     <option value="unread">filter: unread</option>
-                 </select>
-                 
-                 <select id="sortSelect" class="bg-[#3c3c3c] text-gray-300 text-xs p-1 border border-[#3e3e42] outline-none">
-                     <option value="title">sort: title.asc</option>
-                     <option value="year">sort: year.desc</option>
-                     <option value="rating">sort: rating.desc</option>
-                 </select>
-                 
-                 <button id="orderBtn" class="text-left text-xs text-[#569cd6] hover:underline">
-                     <i class="fa-solid fa-arrow-down-a-z"></i> toggle: direction
-                 </button>
-             </div>
+            <!-- Filters in Sidebar -->
+            <div class="px-4 py-2 gap-3 flex flex-col">
+                <select id="readFilter"
+                    class="bg-[#3c3c3c] text-gray-300 text-xs p-1 border border-[#3e3e42] outline-none">
+                    <option value="all">filter: all</option>
+                    <option value="read">filter: read</option>
+                    <option value="unread">filter: unread</option>
+                </select>
+
+                <select id="sortSelect"
+                    class="bg-[#3c3c3c] text-gray-300 text-xs p-1 border border-[#3e3e42] outline-none">
+                    <option value="title">sort: title.asc</option>
+                    <option value="year">sort: year.desc</option>
+                    <option value="rating">sort: rating.desc</option>
+                </select>
+
+                <button id="orderBtn" class="text-left text-xs text-[#569cd6] hover:underline">
+                    <i class="fa-solid fa-arrow-down-a-z"></i> toggle: direction
+                </button>
+            </div>
         </div>
 
         <!-- Editor Area (Grid) -->
         <div class="flex-1 flex flex-col bg-[#1e1e1e] overflow-hidden">
             <!-- Tabs Header -->
             <div class="h-9 bg-[#2d2d2d] flex items-center overflow-x-auto text-sm border-b border-black">
-                <div id="tab-label" class="bg-[#1e1e1e] text-[#d4d4d4] px-4 h-full flex items-center border-t-2 border-[#007acc] gap-2 pr-8 relative">
+                <div id="tab-label"
+                    class="bg-[#1e1e1e] text-[#d4d4d4] px-4 h-full flex items-center border-t-2 border-[#007acc] gap-2 pr-8 relative">
                     <i class="fa-brands fa-js text-yellow-500"></i>
                     <span>main.js</span>
                     <i class="fa-solid fa-xmark text-gray-500 hover:text-white absolute right-2 text-xs"></i>
@@ -188,7 +232,8 @@
                     <div class="text-[#569cd6]">Loading modules...</div>
                 </div>
 
-                <div id="comicGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-4">
+                <div id="comicGrid"
+                    class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-4">
                     <!-- Cards -->
                 </div>
             </div>
@@ -237,14 +282,14 @@
                 const p = document.createElement('div');
                 p.className = cmd.startsWith(">") ? "text-white" : "text-gray-400 pl-4";
                 terminal.appendChild(p);
-                
+
                 // Typing effect for commands
                 if (cmd.startsWith(">")) {
                     p.innerHTML = "> <span class='cursor'></span>";
                     const text = cmd.substring(2);
                     for (let i = 0; i < text.length; i++) {
                         p.querySelector('span').textContent = text.substring(0, i + 1); // Remove cursor for now or keep it?
-                        p.innerHTML = `> ${text.substring(0, i+1)}<span class='cursor'></span>`;
+                        p.innerHTML = `> ${text.substring(0, i + 1)}<span class='cursor'></span>`;
                         await new Promise(r => setTimeout(r, 30));
                     }
                     p.querySelector('.cursor').remove();
@@ -254,7 +299,7 @@
                 }
                 await new Promise(r => setTimeout(r, 300));
             }
-            
+
             footer.classList.remove('hidden');
             setTimeout(() => {
                 document.getElementById('splash').style.opacity = '0';
@@ -289,7 +334,7 @@
             const activeBtn = document.getElementById(`btn-${key}`);
             activeBtn.classList.add('bg-[#37373d]', 'text-white');
             activeBtn.classList.remove('text-[#d4d4d4]');
-            
+
             // Update Breadcrumb & Tab
             const labels = { marvel: 'marvel_comics.js', dc: 'dc_universe.js', others: 'indie_reads.json' };
             document.getElementById('crumb-active').innerText = labels[key];
@@ -319,7 +364,7 @@
 
             const filtered = currentData.filter(row => {
                 if (!row.TITLE) return false;
-                const textMatch = (row.TITLE+row.WRITER+row.CHARACTER).toLowerCase().includes(search);
+                const textMatch = (row.TITLE + row.WRITER + row.CHARACTER).toLowerCase().includes(search);
                 const isRead = (row.READ || '').toUpperCase() === 'TRUE';
                 if (filter === 'read' && !isRead) return false;
                 if (filter === 'unread' && isRead) return false;
@@ -335,7 +380,7 @@
                     res = getYear(a.PUBLISH) - getYear(b.PUBLISH);
                 }
                 else if (sortMode === 'rating') res = (parseFloat(a.RATING) || -1) - (parseFloat(b.RATING) || -1);
-                
+
                 return isDescending ? -res : res;
             });
 
@@ -343,16 +388,16 @@
 
             filtered.forEach(comic => {
                 const isRead = (comic.READ || '').toUpperCase() === 'TRUE';
-                
+
                 // Code Block Card Style
                 const div = document.createElement('div');
                 div.className = "bg-[#252526] p-0 border-l-[3px] border-[#007acc] hover:border-white transition group relative overflow-hidden";
-                if(currentTab === 'marvel') div.style.borderColor = "#c586c0"; // Purple for JS keywords
-                if(currentTab === 'dc') div.style.borderColor = "#4fc1ff"; // Blue
+                if (currentTab === 'marvel') div.style.borderColor = "#c586c0"; // Purple for JS keywords
+                if (currentTab === 'dc') div.style.borderColor = "#4fc1ff"; // Blue
 
                 div.innerHTML = `
                     <!-- Image as tooltip/preview or small side thumbnail? Let's use standard image but dimmed -->
-                    ${comic.IMAGE ? 
+                    ${comic.IMAGE ?
                         `<div class="h-32 overflow-hidden border-b border-[#3e3e42]">
                             <img src="${comic.IMAGE}" class="w-full h-full object-cover opacity-80 group-hover:opacity-100 transition">
                         </div>` : ''
@@ -372,8 +417,8 @@
                     </div>
                     
                     <!-- Hover Action -->
-                    ${comic.LINK ? 
-                    `<a href="${comic.LINK}" target="_blank" class="absolute top-2 right-2 px-2 py-1 bg-[#007acc] text-white text-xs opacity-0 group-hover:opacity-100 transition">
+                    ${comic.LINK ?
+                        `<a href="${comic.LINK}" target="_blank" class="absolute top-2 right-2 px-2 py-1 bg-[#007acc] text-white text-xs opacity-0 group-hover:opacity-100 transition">
                         <i class="fa-solid fa-external-link-alt"></i> Open
                     </a>` : ''}
                 `;
@@ -382,4 +427,5 @@
         }
     </script>
 </body>
+
 </html>
