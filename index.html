@@ -115,14 +115,14 @@
         <div class="w-full max-w-2xl p-10">
             <div id="terminal-text" class="text-green-500 mb-2"></div>
             <div class="text-[var(--text-muted)] text-sm mt-4 hidden" id="splash-footer">Initializing environment...
-                v2.55.0</div>
+                v2.56.0</div>
         </div>
     </div>
 
     <!-- VSCode Title Bar (Fake) -->
     <div class="h-8 bg-[var(--bg-input)] flex items-center justify-between px-4 text-xs select-none">
         <div class="flex gap-4">
-            <span class="font-bold">ComicDB.code-workspace-v2.55.0</span>
+            <span class="font-bold">ComicDB.workspace-v2.56.0</span>
             <span class="text-[var(--text-muted)]">File</span>
             <span class="text-[var(--text-muted)]">Edit</span>
             <span class="text-[var(--text-muted)]">Selection</span>
@@ -260,15 +260,32 @@
                 class="hidden flex-1 overflow-y-auto p-8 font-serif bg-[var(--bg-editor)] text-[var(--text-main)]">
                 <div class="max-w-3xl mx-auto">
                     <h1 class="text-4xl font-bold mb-6 border-b border-[var(--border)] pb-4">About Me</h1>
-                    <p class="mb-4 text-lg leading-relaxed">
-                        Hi, I'm <span class="text-[var(--accent)] font-bold">Timothy</span>. Welcome to my comic
-                        collection page!
-                    </p>
-                    <p class="mb-4 text-lg leading-relaxed">
-                        I built this application to catalog my growing collection of Marvel and DC comics.
-                        This is built upon and directly linked to my Google Sheets database, where I intially stored my
-                        data.
-                    </p>
+
+                    <div class="flex flex-col md:flex-row gap-6 mb-8 items-center md:items-start">
+                        <!-- Profile Image Placeholder -->
+                        <div class="shrink-0 group relative">
+                            <div
+                                class="w-40 h-40 rounded-full border-4 border-[var(--accent)] shadow-xl overflow-hidden bg-[var(--bg-activity)] flex items-center justify-center">
+                                <!-- Replace 'src' with your image URL -->
+                                <img src="https://ui-avatars.com/api/?name=Timothy&background=random&color=fff&size=200"
+                                    alt="Profile"
+                                    class="w-full h-full object-cover opacity-90 group-hover:opacity-100 transition duration-300">
+                            </div>
+                        </div>
+
+                        <div class="flex-1">
+                            <p class="mb-4 text-lg leading-relaxed mt-2">
+                                Hi, I'm <span class="text-[var(--accent)] font-bold">Timothy</span>. Welcome to my comic
+                                collection page!
+                            </p>
+                            <p class="mb-4 text-lg leading-relaxed">
+                                I built this application to catalog my growing collection of Marvel and DC comics.
+                                This is built upon and directly linked to my Google Sheets database, where I intially
+                                stored my
+                                data.
+                            </p>
+                        </div>
+                    </div>
                     <h2 class="text-2xl font-bold mt-8 mb-4">Tech Stack Info</h2>
                     <ul class="list-disc pl-6 space-y-2 mb-8">
                         <li><strong>Frontend:</strong> HTML5, Tailwind CSS, Vanilla JS</li>
