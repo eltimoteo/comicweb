@@ -175,7 +175,7 @@
         <div class="flex-1 flex flex-col bg-[var(--bg-editor)] overflow-hidden">
             <!-- Tabs Header -->
             <div class="h-9 bg-[var(--bg-panel)] flex items-center overflow-x-auto text-sm border-b border-[var(--border)]">
-                <div id="tab-main" onclick="loadSheet(currentTab)" class="cursor-pointer" class="bg-[var(--bg-editor)] text-[var(--text-main)] px-4 h-full flex items-center border-t-2 border-[var(--accent)] gap-2 pr-8 relative">
+                <div id="tab-main" onclick="loadSheet(currentTab)" class="cursor-pointer bg-[var(--bg-editor)] text-[var(--text-main)] px-4 h-full flex items-center border-t-2 border-[var(--accent)] gap-2 pr-8 relative">
                     <i class="fa-brands fa-js text-yellow-500"></i>
                     <span>main.js</span>
                     <i class="fa-solid fa-xmark text-[var(--text-muted)] hover:text-white absolute right-2 text-xs"></i>
@@ -499,7 +499,7 @@
             // Update Breadcrumb & Tab (Also update icon color based on JS/JSON)
             const labels = { marvel: 'marvel_comics.js', dc: 'dc_universe.js', others: 'indie_reads.json' };
             document.getElementById('crumb-active').innerText = labels[key];
-            document.getElementById('tab-label').querySelector('span').innerText = labels[key];
+            document.getElementById('tab-main').querySelector('span').innerText = labels[key];
 
             grid.innerHTML = '';
             document.getElementById('loading').classList.remove('hidden');
