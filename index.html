@@ -115,14 +115,14 @@
         <div class="w-full max-w-2xl p-10">
             <div id="terminal-text" class="text-green-500 mb-2"></div>
             <div class="text-[var(--text-muted)] text-sm mt-4 hidden" id="splash-footer">Initializing environment...
-                v2.53.0</div>
+                v2.55.0</div>
         </div>
     </div>
 
     <!-- VSCode Title Bar (Fake) -->
     <div class="h-8 bg-[var(--bg-input)] flex items-center justify-between px-4 text-xs select-none">
         <div class="flex gap-4">
-            <span class="font-bold">ComicDB.code-workspace-v2.53.0</span>
+            <span class="font-bold">ComicDB.code-workspace-v2.55.0</span>
             <span class="text-[var(--text-muted)]">File</span>
             <span class="text-[var(--text-muted)]">Edit</span>
             <span class="text-[var(--text-muted)]">Selection</span>
@@ -452,13 +452,18 @@
             document.getElementById('icon-files').addEventListener('click', (e) => {
                 // Check computed style or inline style for robustness
                 const isHidden = sidebarExplorer.style.display === 'none';
+                const isAlreadyActive = document.getElementById('icon-files').classList.contains('border-l-2');
+
+                // Reset all icons first
                 document.querySelectorAll('.activity-icon').forEach(i => i.classList.remove('text-[var(--text-active)]', 'border-l-2', 'border-[var(--text-active)]'));
 
-                if (isHidden) {
+                if (!isHidden && isAlreadyActive) {
+                    // Only collapse if it was already the active tab
+                    sidebarExplorer.style.display = 'none';
+                } else {
+                    // Switch to files view
                     sidebarExplorer.style.display = 'flex';
                     document.getElementById('icon-files').classList.add('text-[var(--text-active)]', 'border-l-2', 'border-[var(--text-active)]');
-                } else {
-                    sidebarExplorer.style.display = 'none';
                 }
             });
 
@@ -570,6 +575,10 @@
             const activeBtn = document.getElementById(`btn-${key}`);
             activeBtn.classList.add('bg-[var(--bg-item-active)]', 'text-[var(--text-active)]');
             activeBtn.classList.remove('text-[var(--text-main)]');
+
+            // Force Activity Bar to Defaults (Files)
+            document.querySelectorAll('.activity-icon').forEach(i => i.classList.remove('text-[var(--text-active)]', 'border-l-2', 'border-[var(--text-active)]'));
+            document.getElementById('icon-files').classList.add('text-[var(--text-active)]', 'border-l-2', 'border-[var(--text-active)]');
 
             // Update Breadcrumb & Tab (Also update icon color based on JS/JSON)
             const labels = { marvel: 'marvel_comics.js', dc: 'dc_universe.js', others: 'indie_reads.json' };
