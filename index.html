@@ -68,13 +68,16 @@
                 <option value="read">Read Only</option>
                 <option value="unread">Unread</option>
             </select>
-            <select id="sortSelect" class="p-3 rounded bg-gray-700 border border-gray-600 text-white">
-                <option value="title">Sort by Title (A-Z)</option>
-                <option value="year">Sort by Year (Newest)</option>
-                <option value="rating">Sort by Rating (High)</option>
-                <option value="imprint">Sort by Imprint</option>
-                <option value="character">Sort by Character</option>
-            </select>
+
+            <button id="sortBtn"
+                class="px-4 py-2 rounded bg-gray-700 border border-gray-600 text-white hover:bg-gray-600 transition">
+                <i class="fa-solid fa-sort"></i> Sort: Title
+            </button>
+            <button id="orderBtn"
+                class="px-3 py-2 rounded bg-gray-700 border border-gray-600 text-white hover:bg-gray-600 transition"
+                title="Toggle Order">
+                <i class="fa-solid fa-arrow-down-a-z"></i>
+            </button>
         </div>
 
         <!-- Stats Bar -->
@@ -110,6 +113,11 @@
         let currentData = [];
         let currentTab = 'marvel';
 
+        // Sorting State
+        const sortModes = ['title', 'year', 'rating', 'imprint', 'character'];
+        let currentSortIndex = 0;
+        let isDescending = false; // false = A-Z/Low-High, true = Z-A/High-Low (Depends on logic)
+
         // Initialize
         document.addEventListener('DOMContentLoaded', () => {
             loadSheet('marvel');
@@ -117,8 +125,45 @@
             // Search Listener
             document.getElementById('searchInput').addEventListener('input', renderComics);
             document.getElementById('readFilter').addEventListener('change', renderComics);
-            document.getElementById('sortSelect').addEventListener('change', renderComics);
+
+            // Sort Listeners
+            document.getElementById('sortBtn').addEventListener('click', () => {
+                currentSortIndex = (currentSortIndex + 1) % sortModes.length;
+                updateSortUI();
+                renderComics();
+            });
+
+            document.getElementById('orderBtn').addEventListener('click', () => {
+                isDescending = !isDescending;
+                updateSortUI();
+                renderComics();
+            });
+
+            updateSortUI(); // Initial text
         });
+
+        function updateSortUI() {
+            const mode = sortModes[currentSortIndex];
+            const btn = document.getElementById('sortBtn');
+            const orderBtn = document.getElementById('orderBtn');
+
+            // Update Label
+            const labels = {
+                title: 'Title',
+                year: 'Year',
+                rating: 'Rating',
+                imprint: 'Imprint',
+                character: 'Character'
+            };
+            btn.innerHTML = `<i class="fa-solid fa-sort"></i> Sort: ${labels[mode]}`;
+
+            // Update Icon
+            if (isDescending) {
+                orderBtn.innerHTML = `<i class="fa-solid fa-arrow-down-z-a"></i>`; // Descending
+            } else {
+                orderBtn.innerHTML = `<i class="fa-solid fa-arrow-down-a-z"></i>`; // Ascending
+            }
+        }
 
         function loadSheet(key) {
             currentTab = key;
@@ -155,7 +200,7 @@
             const grid = document.getElementById('comicGrid');
             const search = document.getElementById('searchInput').value.toLowerCase();
             const filter = document.getElementById('readFilter').value;
-            const sortMode = document.getElementById('sortSelect').value;
+            const sortMode = sortModes[currentSortIndex];
 
             grid.innerHTML = '';
 
@@ -179,34 +224,34 @@
             });
 
             // Sorting Logic
+            // Sorting Logic
             filtered.sort((a, b) => {
-                const valA = (a[sortMode.toUpperCase()] || '').toString(); // Fallback for TITLE match if sorting by field
+                let comparison = 0;
 
                 if (sortMode === 'title') {
-                    return (a.TITLE || '').localeCompare(b.TITLE || '');
+                    comparison = (a.TITLE || '').localeCompare(b.TITLE || '');
                 }
-                if (sortMode === 'year') {
-                    // Try to parse year from PUBLISH date string (e.g. "2024", "Oct 2024", "2024-01")
-                    // Simple heuristic: extract first 4 digit number
+                else if (sortMode === 'year') {
                     const getYear = (str) => {
                         const match = (str || '').match(/\d{4}/);
                         return match ? parseInt(match[0]) : 0;
                     };
-                    return getYear(b.PUBLISH) - getYear(a.PUBLISH); // Descending
+                    comparison = getYear(a.PUBLISH) - getYear(b.PUBLISH); // Ascending (Old -> New)
                 }
-                if (sortMode === 'rating') {
-                    // Treat empty rating as -1 so it goes to bottom
+                else if (sortMode === 'rating') {
                     const rA = a.RATING ? parseFloat(a.RATING) : -1;
                     const rB = b.RATING ? parseFloat(b.RATING) : -1;
-                    return rB - rA; // Descending
+                    comparison = rA - rB; // Ascending (Low -> High)
                 }
-                if (sortMode === 'imprint') {
-                    return (a.IMPRINT || '').localeCompare(b.IMPRINT || '');
+                else if (sortMode === 'imprint') {
+                    comparison = (a.IMPRINT || '').localeCompare(b.IMPRINT || '');
                 }
-                if (sortMode === 'character') {
-                    return (a.CHARACTER || '').localeCompare(b.CHARACTER || '');
+                else if (sortMode === 'character') {
+                    comparison = (a.CHARACTER || '').localeCompare(b.CHARACTER || '');
                 }
-                return 0;
+
+                // Apply Direction
+                return isDescending ? -comparison : comparison;
             });
 
             // Update Stats
