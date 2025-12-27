@@ -1,4 +1,5 @@
-<!DOCTYPE html>
+
+html_content = r'''<!DOCTYPE html>
 <html lang="en">
 
 <head>
@@ -473,4 +474,7 @@
         }
     </script>
 </body>
-</html>
+</html>'''
+
+with open('index.html', 'w') as f:
+    f.write(html_content)
