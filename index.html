@@ -131,7 +131,7 @@
         <div class="w-full max-w-2xl p-10">
             <div id="terminal-text" class="text-green-500 mb-2"></div>
             <div class="text-[var(--text-muted)] text-sm mt-4 hidden" id="splash-footer">Initializing environment...
-                v2.7.3</div>
+                v2.7.4</div>
         </div>
     </div>
 
@@ -139,20 +139,21 @@
     <!-- VSCode Title Bar (Fake) -->
     <div class="h-8 bg-[var(--bg-input)] flex items-center justify-between px-4 text-xs select-none">
         <div class="flex gap-4">
-            <span class="font-bold">ComicDB.workspace-v2.7.3</span>
-            <span class="text-[var(--text-muted)]">File</span>
-            <span class="text-[var(--text-muted)]">Edit</span>
-            <span class="text-[var(--text-muted)]">Selection</span>
-            <span class="text-[var(--text-muted)]">View</span>
+            <span class="font-bold">ComicDB.workspace-v2.7.4</span>
+            <span class="text-[var(--text-muted)] hidden md:inline">File</span>
+            <span class="text-[var(--text-muted)] hidden md:inline">Edit</span>
+            <span class="text-[var(--text-muted)] hidden md:inline">Selection</span>
+            <span class="text-[var(--text-muted)] hidden md:inline">View</span>
         </div>
 
         <!-- Command Palette / Search (Centered) -->
-        <div class="flex-1 max-w-xl mx-4 relative">
+        <div class="flex-1 max-w-xl mx-2 md:mx-4 relative">
             <div
                 class="bg-[var(--bg-panel)] rounded-md border border-[var(--border)] flex items-center px-2 py-0.5 w-full">
                 <i class="fa-solid fa-search text-[var(--text-muted)] text-xs mr-2"></i>
                 <input type="text" id="searchInput" placeholder="Search (Cmd+F)"
-                    class="bg-transparent border-none text-[var(--text-main)] text-xs w-full focus:outline-none placeholder-gray-500">
+                    class="bg-transparent border-none text-white text-xs w-full focus:outline-none placeholder-[var(--text-muted)]"
+                    style="color: white !important; -webkit-text-fill-color: white !important;">
             </div>
         </div>
 
