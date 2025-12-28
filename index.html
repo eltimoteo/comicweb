@@ -690,7 +690,7 @@
                             <div><span style="color: var(--variable)">artist</span>: <span style="color: var(--string)">"${comic.ARTIST}"</span>;</div>
                             <div><span style="color: var(--variable)">year</span>: <span style="color: var(--number)">${(comic.PUBLISH || '').match(/\d{4}/)?.[0] || 'null'}</span>;</div>
                             <div><span style="color: var(--variable)">read</span>: <span style="color: var(--keyword)">${isRead}</span>;</div>
-                            <div><span style="color: var(--variable)">owned</span>: <span style="color: var(--keyword)">${isOwned}</span>;</div>
+                            <div><span style="color: var(--variable)">own</span>: <span style="color: var(--keyword)">${isOwned}</span>;</div>
                             ${comic.RATING ? `<div><span style="color: var(--variable)">rating</span>: <span style="color: var(--number)">${comic.RATING}</span>;</div>` : ''}
                         </div>
                         
