@@ -1,9 +1,18 @@
-const CACHE_NAME = 'comicdb-v2.6.1';
+const CACHE_NAME = 'comicdb-v2.7.0';
+
+// Get the base path from the service worker's location
+const getBasePath = () => {
+    const swPath = self.location.pathname;
+    return swPath.substring(0, swPath.lastIndexOf('/') + 1);
+};
+
+const BASE_PATH = getBasePath();
+
 const STATIC_ASSETS = [
-    '/index.html',
-    '/manifest.json',
-    '/icon-192.png',
-    '/icon-512.png',
+    `${BASE_PATH}index.html`,
+    `${BASE_PATH}manifest.json`,
+    `${BASE_PATH}icon-192.png`,
+    `${BASE_PATH}icon-512.png`,
     'https://cdn.tailwindcss.com',
     'https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.0/papaparse.min.js',
     'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css',

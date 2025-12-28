@@ -2,7 +2,7 @@
     "name": "ComicDB - VSCode Mode",
     "short_name": "ComicDB",
     "description": "A VSCode-themed comic collection tracker for Marvel, DC, and indie comics",
-    "start_url": "/index.html",
+    "start_url": "./",
     "display": "standalone",
     "background_color": "#1e1e1e",
     "theme_color": "#007acc",
