@@ -1,4 +1,4 @@
-const CACHE_NAME = 'comicdb-v2.7.0';
+const CACHE_NAME = 'comicdb-v2.7.2';
 
 // Get the base path from the service worker's location
 const getBasePath = () => {

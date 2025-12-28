@@ -131,7 +131,7 @@
         <div class="w-full max-w-2xl p-10">
             <div id="terminal-text" class="text-green-500 mb-2"></div>
             <div class="text-[var(--text-muted)] text-sm mt-4 hidden" id="splash-footer">Initializing environment...
-                v2.7.0</div>
+                v2.7.2</div>
         </div>
     </div>
 
@@ -139,7 +139,7 @@
     <!-- VSCode Title Bar (Fake) -->
     <div class="h-8 bg-[var(--bg-input)] flex items-center justify-between px-4 text-xs select-none">
         <div class="flex gap-4">
-            <span class="font-bold">ComicDB.workspace-v2.7.0</span>
+            <span class="font-bold">ComicDB.workspace-v2.7.2</span>
             <span class="text-[var(--text-muted)]">File</span>
             <span class="text-[var(--text-muted)]">Edit</span>
             <span class="text-[var(--text-muted)]">Selection</span>
@@ -236,7 +236,6 @@
                     <option value="title">sort: title</option>
                     <option value="year">sort: year</option>
                     <option value="rating">sort: rating</option>
-                    <option value="own">sort: own</option>
                 </select>
 
                 <button id="orderBtn" class="text-left text-xs text-[var(--keyword)] hover:underline">
@@ -674,11 +673,6 @@
                     res = getYear(a.PUBLISH) - getYear(b.PUBLISH);
                 }
                 else if (sortMode === 'rating') res = (parseFloat(a.RATING) || -1) - (parseFloat(b.RATING) || -1);
-                else if (sortMode === 'own') {
-                    const isOwnedA = (a.OWN || '').toUpperCase() === 'TRUE';
-                    const isOwnedB = (b.OWN || '').toUpperCase() === 'TRUE';
-                    res = (isOwnedA ? 1 : 0) - (isOwnedB ? 1 : 0);
-                }
 
                 return isDescending ? -res : res;
             });
@@ -704,6 +698,10 @@
                         </div>` : ''
                     }
                     
+                    ${isOwned ? `<div class="absolute top-2 left-2 w-6 h-6 rounded-full bg-green-500 flex items-center justify-center shadow-lg z-10">
+                        <i class="fa-solid fa-check text-white text-xs"></i>
+                    </div>` : ''}
+                    
                     <div class="p-3 font-mono text-xs">
                         <div style="color: var(--keyword)" class="mb-1">class <span style="color: var(--type)">${(comic.TITLE || '').replace(/\s+/g, '')}</span> {</div>
                         
@@ -712,7 +710,6 @@
                             <div><span style="color: var(--variable)">artist</span>: <span style="color: var(--string)">"${comic.ARTIST}"</span>;</div>
                             <div><span style="color: var(--variable)">year</span>: <span style="color: var(--number)">${(comic.PUBLISH || '').match(/\d{4}/)?.[0] || 'null'}</span>;</div>
                             <div><span style="color: var(--variable)">read</span>: <span style="color: var(--keyword)">${isRead}</span>;</div>
-                            <div><span style="color: var(--variable)">own</span>: <span style="color: var(--keyword)">${isOwned}</span>;</div>
                             ${comic.RATING ? `<div><span style="color: var(--variable)">rating</span>: <span style="color: var(--number)">${comic.RATING}</span>;</div>` : ''}
                         </div>
                         
