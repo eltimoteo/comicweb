@@ -131,7 +131,7 @@
         <div class="w-full max-w-2xl p-10">
             <div id="terminal-text" class="text-green-500 mb-2"></div>
             <div class="text-[var(--text-muted)] text-sm mt-4 hidden" id="splash-footer">Initializing environment...
-                v2.7.2</div>
+                v2.7.3</div>
         </div>
     </div>
 
@@ -139,7 +139,7 @@
     <!-- VSCode Title Bar (Fake) -->
     <div class="h-8 bg-[var(--bg-input)] flex items-center justify-between px-4 text-xs select-none">
         <div class="flex gap-4">
-            <span class="font-bold">ComicDB.workspace-v2.7.2</span>
+            <span class="font-bold">ComicDB.workspace-v2.7.3</span>
             <span class="text-[var(--text-muted)]">File</span>
             <span class="text-[var(--text-muted)]">Edit</span>
             <span class="text-[var(--text-muted)]">Selection</span>
@@ -342,16 +342,18 @@
     </div>
 
     <!-- Status Bar -->
-    <div class="h-6 bg-[var(--accent)] flex items-center justify-between px-3 text-[11px] text-white">
-        <div class="flex gap-4">
-            <span><i id="icon-git" class="fa-solid fa-code-branch text-[10px]"></i> main*</span>
-            <span><i class="fa-regular fa-circle-xmark"></i> 0</span>
-            <span><i class="fa-solid fa-triangle-exclamation"></i> 0</span>
+    <div
+        class="h-6 bg-[var(--accent)] flex items-center justify-between px-2 md:px-3 text-[9px] md:text-[11px] text-white overflow-hidden">
+        <div class="flex gap-1.5 md:gap-4">
+            <span class="hidden sm:inline"><i id="icon-git" class="fa-solid fa-code-branch text-[10px]"></i>
+                main*</span>
+            <span class="hidden sm:inline"><i class="fa-regular fa-circle-xmark"></i> 0</span>
+            <span class="hidden sm:inline"><i class="fa-solid fa-triangle-exclamation"></i> 0</span>
         </div>
-        <div class="flex gap-4">
-            <span>Ln 6, Col 7</span>
-            <span>UTF-8</span>
-            <span>JavaScript</span>
+        <div class="flex gap-1.5 md:gap-4">
+            <span class="hidden lg:inline">Ln 6, Col 7</span>
+            <span class="hidden md:inline">UTF-8</span>
+            <span class="hidden sm:inline">JavaScript</span>
             <span>Powered by Antigravity</span>
             <span><i class="fa-regular fa-bell"></i></span>
         </div>
